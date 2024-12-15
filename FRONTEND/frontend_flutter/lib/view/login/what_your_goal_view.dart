@@ -14,7 +14,8 @@ class WhatYourGoalView extends StatefulWidget {
 }
 
 class _WhatYourGoalViewState extends State<WhatYourGoalView> {
-  CarouselController buttonCarouselController = CarouselController();
+  carousel_slider.CarouselController buttonCarouselController =
+      carousel_slider.CarouselController();
 
   List goalArr = [
     {
