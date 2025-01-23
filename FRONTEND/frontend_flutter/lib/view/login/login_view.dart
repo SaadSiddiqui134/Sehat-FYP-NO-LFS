@@ -55,7 +55,7 @@ class _LoginViewState extends State<LoginView> {
                   hitText: "Password",
                   icon: "assets/img/lock.png",
                   obscureText: true,
-                  rigtIcon: TextButton(
+                  rightIcon: TextButton(
                       onPressed: () {},
                       child: Container(
                           alignment: Alignment.center,
@@ -81,7 +81,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ],
                 ),
-               const Spacer(),
+                const Spacer(),
                 RoundButton(
                     title: "Login",
                     onPressed: () {
