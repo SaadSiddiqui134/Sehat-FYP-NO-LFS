@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from .models import User
 
 # List all users
@@ -34,25 +35,37 @@ def user_detail(request, user_id):
 @csrf_exempt
 def create_user(request):
     if request.method == "POST":
+        # Retrieve data from the POST request
         first_name = request.POST.get("UserFirstName")
         last_name = request.POST.get("UserLastName")
         email = request.POST.get("UserEmail")
         password = request.POST.get("UserPassword")
+        gender = request.POST.get("UserGender", 'Male')  # Default value if not provided
+        weight = request.POST.get("UserWeight")  # User's weight
+        height = request.POST.get("UserHeight")  # User's height
+        created_at = timezone.now()  # Automatically set to the current time
 
-        print("recieved parameters: firstName: {first_name}, lastName: {last_name}, email: {email}, password: {password}")
-        # Hash the password
+        print(f"Received parameters: firstName: {first_name}, lastName: {last_name}, email: {email}, password: {password}, gender: {gender}, weight: {weight}, height: {height}")
+
+        # Hash the password before saving to the database
         hashed_password = make_password(password)
-        print("hashed password: {hashed_password}")
-        # Save the new user
+        print(f"Hashed password: {hashed_password}")
+
+        # Save the new user to the database
         user_obj = User.objects.create(
             UserFirstName=first_name,
             UserLastName=last_name,
             UserEmail=email,
             UserPassword=hashed_password,
+            UserGender=gender,  # Include the gender field
+            UserWeight=weight,   # Include the weight field
+            UserHeight=height,   # Include the height field
+            created_at=created_at  # Save the created_at timestamp
         )
-        return JsonResponse({"status": "success", "UserID": user_obj.UserID})
-    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
+        return JsonResponse({"status": "success", "UserID": user_obj.UserID})
+
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 # Update an existing user's details (excluding password updates here)
 def update_user(request, user_id):
     user_obj = get_object_or_404(User, UserID=user_id)
@@ -65,7 +78,7 @@ def update_user(request, user_id):
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
 # Delete a user
-def delete_user(request, user_id):
+def delete_user(request, user_id):  
     user_obj = get_object_or_404(User, UserID=user_id)
     user_obj.delete()
     return JsonResponse({"status": "success", "message": "User deleted successfully"})
