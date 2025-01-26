@@ -49,7 +49,18 @@ void _handleSignup(
       );
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const LoginView()),
+        MaterialPageRoute(
+            builder: (context) => LoginView(
+                  userData: {
+                    'firstname': firstname,
+                    'lastname': lastname,
+                    'email': email,
+                    'gender': gender,
+                    'weight': weight,
+                    'height': height_cm
+                  },
+                  // Add more fields as needed
+                )),
       );
     } else {
       // Show the error in case of failure

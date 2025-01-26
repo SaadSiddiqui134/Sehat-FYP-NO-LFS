@@ -10,7 +10,8 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+  final Map<String, String>? userData; // Accepts signup data
+  const LoginView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -41,13 +42,23 @@ void _handleLogin(BuildContext context, String email, String password) async {
         // Extract user data properly from the 'data' field
         final userData = data['data'];
 
+        print("userData from login func: $userData ");
         // Navigate to the next screen on successful login
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MainTabView(), // Adjust as needed
+            builder: (context) => MainTabView(userData: {
+              'firstname': userData['UserFirstName'],
+              'lastname': userData['UserLastName'],
+              'email': userData['UserEmail'],
+              'gender': userData['UserGender'],
+              'weight': userData['UserWeight'.toString()],
+              'height': userData['UserHeight'.toString()],
+            }), // Adjust as needed
           ),
         );
+
+        print("passed user data from login: $userData");
 
         // Show a success message
         ScaffoldMessenger.of(context).showSnackBar(

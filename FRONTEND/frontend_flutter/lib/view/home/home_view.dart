@@ -11,7 +11,8 @@ import 'finished_workout_view.dart';
 import 'notification_view.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final Map<String, String>? userData;
+  const HomeView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -89,6 +90,17 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
+    final firstName = widget.userData?['firstname'] ?? 'Guest';
+    final lastname = widget.userData?['lastname'] ?? ' ';
+    final email = widget.userData?['email'] ?? ' email@gmail.com';
+    final gender = widget.userData?['gender'] ?? 'Male';
+    final weight = double.tryParse(widget.userData?['weight'] ?? '80') ?? 80;
+    final heightInCm =
+        double.tryParse(widget.userData?['height'] ?? '170') ?? 170;
+
+    // final weightDouble = double.tryParse(weight);
+    // final heightDouble = double.tryParse(height);
+
     final lineBarsData = [
       LineChartBarData(
         showingIndicators: showingTooltipOnSpots,
@@ -127,11 +139,11 @@ class _HomeViewState extends State<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Welcome Back,",
+                          "Welcome,",
                           style: TextStyle(color: TColor.gray, fontSize: 12),
                         ),
                         Text(
-                          "Stefani Wong",
+                          "$firstName $lastname",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 20,
@@ -222,7 +234,7 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                                 sectionsSpace: 1,
                                 centerSpaceRadius: 0,
-                                sections: showingSections(),
+                                sections: showingSections(weight, heightInCm),
                               ),
                             ),
                           ),
@@ -952,42 +964,90 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  List<PieChartSectionData> showingSections() {
+  List<PieChartSectionData> showingSections(double weight, double heightInCm) {
+    // Convert height from cm to meters
+    double heightInM = heightInCm / 100;
+
+    // Calculate BMI: BMI = weight (kg) / height (m)^2
+    double bmi =
+        weight > 0 && heightInM > 0 ? weight / (heightInM * heightInM) : 0;
+
+    // Generate pie chart sections
     return List.generate(
-      2,
+      2, // Two slices
       (i) {
         var color0 = TColor.secondaryColor1;
 
         switch (i) {
-          case 0:
+          case 0: // Larger slice with BMI
             return PieChartSectionData(
-                color: color0,
-                value: 33,
-                title: '',
-                radius: 55,
-                titlePositionPercentageOffset: 0.55,
-                badgeWidget: const Text(
-                  "20,1",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700),
-                ));
-          case 1:
+              color: color0,
+              value: 33, // Fixed value for the slice size
+              title: '', // No title text
+              radius: 55, // Larger radius for the slice
+              titlePositionPercentageOffset: 0.55,
+              badgeWidget: Text(
+                bmi > 0
+                    ? bmi.toStringAsFixed(1)
+                    : "N/A", // Display BMI or fallback
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            );
+          case 1: // Smaller slice
             return PieChartSectionData(
               color: Colors.white,
               value: 75,
-              title: '',
-              radius: 45,
+              title: '', // No title text
+              radius: 45, // Smaller radius
               titlePositionPercentageOffset: 0.55,
             );
-
           default:
-            throw Error();
+            throw Error(); // Safeguard for unexpected indices
         }
       },
     );
   }
+
+  // List<PieChartSectionData> showingSections() {
+  //   return List.generate(
+  //     2,
+  //     (i) {
+  //       var color0 = TColor.secondaryColor1;
+
+  //       switch (i) {
+  //         case 0:
+  //           return PieChartSectionData(
+  //               color: color0,
+  //               value: 33,
+  //               title: '',
+  //               radius: 55,
+  //               titlePositionPercentageOffset: 0.55,
+  //               badgeWidget: const Text(
+  //                 "20,1",
+  //                 style: TextStyle(
+  //                     color: Colors.white,
+  //                     fontSize: 12,
+  //                     fontWeight: FontWeight.w700),
+  //               ));
+  //         case 1:
+  //           return PieChartSectionData(
+  //             color: Colors.white,
+  //             value: 75,
+  //             title: '',
+  //             radius: 45,
+  //             titlePositionPercentageOffset: 0.55,
+  //           );
+
+  //         default:
+  //           throw Error();
+  //       }
+  //     },
+  //   );
+  // }
 
   LineTouchData get lineTouchData1 => LineTouchData(
         handleBuiltInTouches: true,

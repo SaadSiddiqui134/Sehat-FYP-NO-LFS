@@ -95,6 +95,8 @@ def login_user(request):
             user_obj = User.objects.get(UserEmail=email)
             user_obj.UserPassword = make_password(password)
             user_obj.save()
+            user_obj.UserWeight = str(user_obj.UserWeight)
+            user_obj.UserHeight = str(user_obj.UserHeight)
             
             # Check if the password is correct (compare the plain password with the hashed password)
             if check_password(password, user_obj.UserPassword):
@@ -104,9 +106,12 @@ def login_user(request):
                     "success": True,
                     "data": {
                         "UserID": user_obj.UserID,
-                        "UserEmail": user_obj.UserEmail,
-                        "UserFirstName": user_obj.UserFirstName,
-                        "UserLastName": user_obj.UserLastName,
+                        "UserFirstName": user_obj.UserFirstName, 
+                        "UserLastName": user_obj.UserLastName, 
+                        "UserEmail": user_obj.UserEmail, 
+                        "UserGender": user_obj.UserGender, 
+                        "UserWeight": user_obj.UserWeight, 
+                        "UserHeight": user_obj.UserHeight
                     },
                     "code": 200,
                 })
