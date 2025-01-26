@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from django.contrib.auth.hashers import make_password
+from django.http import JsonResponse 
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
 from .models import User
 
 # List all users
@@ -36,9 +38,10 @@ def create_user(request):
         email = request.POST.get("UserEmail")
         password = request.POST.get("UserPassword")
 
+        print("recieved parameters: firstName: {first_name}, lastName: {last_name}, email: {email}, password: {password}")
         # Hash the password
         hashed_password = make_password(password)
-
+        print("hashed password: {hashed_password}")
         # Save the new user
         user_obj = User.objects.create(
             UserFirstName=first_name,
@@ -65,3 +68,55 @@ def delete_user(request, user_id):
     user_obj = get_object_or_404(User, UserID=user_id)
     user_obj.delete()
     return JsonResponse({"status": "success", "message": "User deleted successfully"})
+
+
+@csrf_exempt
+def login_user(request):
+    if request.method == "POST":
+        email = request.POST.get("UserEmail")
+        password = request.POST.get("UserPassword")
+        print(f"Received email: {email}, password: {password}")
+        try:
+            # Find the user by email
+            user_obj = User.objects.get(UserEmail=email)
+            user_obj.UserPassword = make_password(password)
+            user_obj.save()
+            
+            # Check if the password is correct (compare the plain password with the hashed password)
+            if check_password(password, user_obj.UserPassword):
+                # User is authenticated, log them in
+                login(request, user_obj)
+                return JsonResponse({
+                    "success": True,
+                    "data": {
+                        "UserID": user_obj.UserID,
+                        "UserEmail": user_obj.UserEmail,
+                        "UserFirstName": user_obj.UserFirstName,
+                        "UserLastName": user_obj.UserLastName,
+                    },
+                    "code": 200,
+                })
+            else:
+                return JsonResponse({
+                    "success": False,
+                    "error": {
+                        "code": "INVALID_CREDENTIALS",
+                        "message": "The email or password provided is incorrect."
+                    }
+                }, status=400)
+        except User.DoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "error": {
+                    "code": "INVALID_CREDENTIALS",
+                    "message": "user doesnt exist."
+                }
+            }, status=400)
+
+    return JsonResponse({
+        "success": False,
+        "error": {
+            "code": "INVALID_METHOD",
+            "message": "Only POST requests are allowed."
+        }
+    }, status=405)

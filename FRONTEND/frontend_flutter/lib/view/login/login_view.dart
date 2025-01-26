@@ -4,6 +4,8 @@ import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:fitness/view/login/complete_profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/view/login/signup_view.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -12,8 +14,75 @@ class LoginView extends StatefulWidget {
   State<LoginView> createState() => _LoginViewState();
 }
 
+void _handleLogin(BuildContext context, String email, String password) async {
+  const String loginUrl =
+      'http://192.168.5.43:8000/user/login/'; // Update with actual URL
+
+  try {
+    final response = await http.post(
+      Uri.parse(loginUrl),
+      body: {
+        'UserEmail': email,
+        'UserPassword': password,
+      },
+    );
+    print(response.body); // To check the response
+
+    // Check if the response status is 200
+    if (response.statusCode == 200) {
+      // Parse the JSON response into a Map
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      // Now handle the data correctly
+      if (data != null && data['success'] == true) {
+        // Extract user data properly from the 'data' field
+        final userData = data['data'];
+
+        // Navigate to the next screen on successful login
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CompleteProfileView(), // Adjust as needed
+          ),
+        );
+
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "Welcome, ${userData['UserFirstName']} ${userData['UserLastName']}"),
+          ),
+        );
+      } else {
+        // If 'success' is false, handle the error
+        final error = data['error'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text(error != null ? error['message'] : 'Invalid credentials'),
+          ),
+        );
+      }
+    } else {
+      // Handle other status codes
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Server Error: ${response.statusCode}')),
+      );
+    }
+  } catch (e) {
+    print("Error: ${e.toString()}"); // Log the error message
+    // Handle network errors
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An error occured. Check logs')),
+    );
+  }
+}
+
 class _LoginViewState extends State<LoginView> {
   bool isCheck = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -44,10 +113,11 @@ class _LoginViewState extends State<LoginView> {
                 SizedBox(
                   height: media.width * 0.04,
                 ),
-                const RoundTextField(
+                RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
                   keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 SizedBox(
                   height: media.width * 0.04,
@@ -56,6 +126,7 @@ class _LoginViewState extends State<LoginView> {
                   hitText: "Password",
                   icon: "assets/img/lock.png",
                   obscureText: true,
+                  controller: _passwordController,
                   rightIcon: TextButton(
                       onPressed: () {},
                       child: Container(
@@ -86,11 +157,12 @@ class _LoginViewState extends State<LoginView> {
                 RoundButton(
                     title: "Login",
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const CompleteProfileView()));
+                      final email = _emailController
+                          .text; // Retrieve email from RoundTextField
+                      final password = _passwordController
+                          .text; // Retrieve password from RoundTextField
+                      print("Email: $email, Password: $password");
+                      _handleLogin(context, email, password);
                     }),
                 SizedBox(
                   height: media.width * 0.04,
