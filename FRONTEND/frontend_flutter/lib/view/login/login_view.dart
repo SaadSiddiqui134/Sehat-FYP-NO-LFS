@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fitness/view/login/signup_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -15,9 +16,10 @@ class LoginView extends StatefulWidget {
   State<LoginView> createState() => _LoginViewState();
 }
 
+final String ip = dotenv.env['IP_CONFIG'] ?? 'http://default-url:8000';
 void _handleLogin(BuildContext context, String email, String password) async {
   const String loginUrl =
-      'http://192.168.5.43:8000/user/login/'; // Update with actual URL
+      "http://192.168.5.43:8000/user/login/"; // Update with actual URL
 
   try {
     final response = await http.post(
