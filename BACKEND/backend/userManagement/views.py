@@ -31,6 +31,7 @@ def user_detail(request, user_id):
     return JsonResponse(user_data)
 
 # Create a new user with hashed password
+@csrf_exempt
 def create_user(request):
     if request.method == "POST":
         first_name = request.POST.get("UserFirstName")
