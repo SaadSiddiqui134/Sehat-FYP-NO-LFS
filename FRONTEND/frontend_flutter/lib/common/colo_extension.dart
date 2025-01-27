@@ -1,22 +1,25 @@
-
 import 'package:flutter/material.dart';
 
 class TColor {
-  static Color get primaryColor1 => const Color(0xff92A3FD);
-  static Color get primaryColor2 => const Color(0xff9DCEFF);
+  // Function to convert a hex string to Color
+  static Color hexToColor(String hex) {
+    return Color(int.parse(hex.replaceAll('#', '0xFF')));
+  }
 
-  static Color get secondaryColor1 => const Color(0xffC58BF2);
-  static Color get secondaryColor2 => const Color(0xffEEA4CE);
+  // Using hexToColor for colors
+  static Color get backgroundColor2 => hexToColor('#123524');
+  static Color get backgroundColor => hexToColor('#006A67');
+  static Color get primaryColor1 => hexToColor('#16423C');
+  static Color get primaryColor2 => hexToColor('#6A9C89');
 
+  static Color get secondaryColor1 => hexToColor('#C4DAD2');
+  static Color get secondaryColor2 => hexToColor('#E9EFEC');
 
-  static List<Color> get primaryG => [ primaryColor2, primaryColor1 ];
+  static List<Color> get primaryG => [primaryColor2, primaryColor1];
   static List<Color> get secondaryG => [secondaryColor2, secondaryColor1];
 
-  static Color get black => const Color(0xff1D1617);
-  static Color get gray => const Color(0xff786F72);
+  static Color get black => hexToColor('#181C14');
+  static Color get gray => hexToColor('#3C3D37');
   static Color get white => Colors.white;
-  static Color get lightGray => const Color(0xffF7F8F8);
-
-
-
+  static Color get lightGray => hexToColor('#F7F8F8');
 }

@@ -7,7 +7,8 @@ import '../../common_widget/title_subtitle_cell.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+  final Map<String, String>? userData;
+  const ProfileView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
@@ -38,9 +39,16 @@ class _ProfileViewState extends State<ProfileView> {
   ];
   @override
   Widget build(BuildContext context) {
+    final firstName = widget.userData?['firstname'] ?? 'Guest';
+    final lastname = widget.userData?['lastname'] ?? ' ';
+    final email = widget.userData?['email'] ?? ' email@gmail.com';
+    final gender = widget.userData?['gender'] ?? 'Male';
+    final weight = widget.userData?['weight'] ?? '80';
+    final heightInCm = widget.userData?['height'] ?? '170';
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: TColor.white,
+        backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
         leadingWidth: 0,
@@ -70,7 +78,7 @@ class _ProfileViewState extends State<ProfileView> {
           )
         ],
       ),
-      backgroundColor: TColor.white,
+      backgroundColor: TColor.backgroundColor,
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
@@ -80,14 +88,20 @@ class _ProfileViewState extends State<ProfileView> {
               Row(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: Image.asset(
-                      "assets/img/u2.png",
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      borderRadius: BorderRadius.circular(30),
+                      child: gender == "female"
+                          ? Image.asset(
+                              "assets/img/u2.png",
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              "assets/img/u1.png",
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            )),
                   const SizedBox(
                     width: 15,
                   ),
@@ -96,20 +110,20 @@ class _ProfileViewState extends State<ProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Stefani Wong",
+                          "$firstName $lastname",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Text(
-                          "Lose a Fat Program",
-                          style: TextStyle(
-                            color: TColor.gray,
-                            fontSize: 12,
-                          ),
-                        )
+                        // Text(
+                        //   "Lose a Fat Program",
+                        //   style: TextStyle(
+                        //     color: TColor.gray,
+                        //     fontSize: 12,
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
@@ -136,11 +150,11 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 15,
               ),
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "180cm",
+                      title: "$heightInCm cm",
                       subtitle: "Height",
                     ),
                   ),
@@ -149,7 +163,7 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "65kg",
+                      title: "$weight kg",
                       subtitle: "Weight",
                     ),
                   ),
@@ -158,8 +172,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "22yo",
-                      subtitle: "Age",
+                      title: "$gender",
+                      subtitle: "Gender",
                     ),
                   ),
                 ],
@@ -273,11 +287,10 @@ class _ProfileViewState extends State<ProfileView> {
                                     Positioned(
                                         left: 10.0,
                                         right: 10.0,
-                                        
                                         height: 30.0,
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
-                                             gradient: LinearGradient(
+                                            gradient: LinearGradient(
                                                 colors: TColor.secondaryG),
                                             borderRadius:
                                                 const BorderRadius.all(
