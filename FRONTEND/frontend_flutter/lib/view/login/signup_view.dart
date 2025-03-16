@@ -25,7 +25,11 @@ void _handleSignup(
     String gender,
     String weight,
     String height_cm) async {
-  const String SignupUrl = 'http://192.168.5.43:8000/user/create/';
+  const String SignupUrl = 'http://192.168.87.188w:8000/user/create/';
+
+  // 192.168.81.188 (hotspot me)
+
+  // 192.168.5.43:8000 (wifi)
 
   try {
     final response = await http.post(

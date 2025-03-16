@@ -20,8 +20,10 @@ class LoginView extends StatefulWidget {
 final String ip = dotenv.env['IP_CONFIG'] ?? 'http://default-url:8000';
 void _handleLogin(BuildContext context, String email, String password) async {
   const String loginUrl =
-      "http://192.168.5.43:8000/user/login/"; // Update with actual URL
+      "http://192.168.87.188:8000/user/login/"; // Update with actual URL
+  // 192.168.81.188 (hotspot me)
 
+  // 192.168.5.43:8000 (wifi)
   try {
     final response = await http.post(
       Uri.parse(loginUrl),
@@ -73,7 +75,7 @@ void _handleLogin(BuildContext context, String email, String password) async {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                Text(error != null ? error['message'] : 'Invalid credentials'),
+                Text(error != null ? data['error'] : 'Invalid credentials'),
           ),
         );
       }
