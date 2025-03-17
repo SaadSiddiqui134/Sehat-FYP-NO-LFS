@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fitness/common/colo_extension.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
@@ -18,10 +19,10 @@ class LoginView extends StatefulWidget {
 }
 
 final String ip = dotenv.env['IP_CONFIG'] ?? 'http://default-url:8000';
+
 void _handleLogin(BuildContext context, String email, String password) async {
-  const String loginUrl =
-      "http://192.168.87.188:8000/user/login/"; // Update with actual URL
-  // 192.168.81.188 (hotspot me)
+  print(ip);
+  String loginUrl = "http://$ip:8000/user/login/"; // Update with actual URL
 
   // 192.168.5.43:8000 (wifi)
   try {
