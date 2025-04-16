@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse 
 from django.contrib.auth.hashers import make_password, check_password
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import  login
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import User

@@ -7,7 +7,7 @@ import '../../common_widget/title_subtitle_cell.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 
 class ProfileView extends StatefulWidget {
-  final Map<String, String>? userData;
+  final Map<String, dynamic>? userData;
   const ProfileView({Key? key, this.userData}) : super(key: key);
 
   @override

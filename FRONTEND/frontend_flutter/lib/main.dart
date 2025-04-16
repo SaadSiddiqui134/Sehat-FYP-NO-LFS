@@ -1,10 +1,15 @@
 import 'package:fitness/view/login/login_view.dart';
 import 'package:fitness/view/main_tab/main_tab_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'common/colo_extension.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensures binding before async code
+  await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
 

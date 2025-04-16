@@ -9,7 +9,8 @@ import 'meal_food_details_view.dart';
 import 'meal_schedule_view.dart';
 
 class MealPlannerView extends StatefulWidget {
-  const MealPlannerView({super.key});
+  final Map<String, dynamic>? userData;
+  const MealPlannerView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<MealPlannerView> createState() => _MealPlannerViewState();
@@ -290,7 +291,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             onPressed: () {
-                               Navigator.push(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
@@ -390,8 +391,12 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                   itemBuilder: (context, index) {
                     var fObj = findEatArr[index] as Map? ?? {};
                     return InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => MealFoodDetailsView(eObj: fObj) ) );
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    MealFoodDetailsView(eObj: fObj)));
                       },
                       child: FindEatCell(
                         fObj: fObj,

@@ -11,7 +11,7 @@ import '../profile/profile_view.dart';
 import '../workout_tracker/workout_tracker_view.dart';
 
 class MainTabView extends StatefulWidget {
-  final Map<String, String> userData;
+  final Map<String, dynamic>? userData;
   const MainTabView({Key? key, required this.userData}) : super(key: key);
 
   @override

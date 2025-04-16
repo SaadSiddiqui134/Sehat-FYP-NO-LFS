@@ -7,7 +7,8 @@ import '../../common_widget/round_button.dart';
 import '../../common_widget/today_sleep_schedule_row.dart';
 
 class SleepTrackerView extends StatefulWidget {
-  const SleepTrackerView({super.key});
+  final Map<String, dynamic>? userData;
+  const SleepTrackerView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<SleepTrackerView> createState() => _SleepTrackerViewState();
@@ -74,26 +75,26 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: TColor.lightGray,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/img/more_btn.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
-        ],
+        // actions: [
+        //   InkWell(
+        //     onTap: () {},
+        //     child: Container(
+        //       margin: const EdgeInsets.all(8),
+        //       height: 40,
+        //       width: 40,
+        //       alignment: Alignment.center,
+        //       decoration: BoxDecoration(
+        //           color: TColor.lightGray,
+        //           borderRadius: BorderRadius.circular(10)),
+        //       child: Image.asset(
+        //         "assets/img/more_btn.png",
+        //         width: 15,
+        //         height: 15,
+        //         fit: BoxFit.contain,
+        //       ),
+        //     ),
+        //   )
+        // ],
       ),
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
@@ -108,6 +109,7 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                   Container(
                       padding: const EdgeInsets.only(left: 15),
                       height: media.width * 0.5,
+                      color: TColor.lightGray,
                       width: double.maxFinite,
                       child: LineChart(
                         LineChartData(
@@ -293,8 +295,8 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SleepScheduleView(),
+                                  builder: (context) => SleepScheduleView(
+                                      userData: widget.userData),
                                 ),
                               );
                             },

@@ -9,31 +9,36 @@ import 'package:fitness/view/login/signup_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fitness/api_constants.dart';
 
 class LoginView extends StatefulWidget {
-  final Map<String, String>? userData; // Accepts signup data
-  const LoginView({Key? key, this.userData}) : super(key: key);
+  final Map<String, dynamic>? userDataFromSignup; // Accepts signup data
+  const LoginView({Key? key, this.userDataFromSignup}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
 }
 
-final String ip = dotenv.env['IP_CONFIG'] ?? 'http://default-url:8000';
+// final String ip = dotenv.env['IP_CONFIG'] ?? 'http://10.0.2.2:8000/user/login/';
 
 void _handleLogin(BuildContext context, String email, String password) async {
-  print(ip);
-  String loginUrl = "http://$ip:8000/user/login/"; // Update with actual URL
+  // print(ip);
+  // String loginUrl = "http://$ip:8000/user/login/"; // Update with actual URL
 
   // 192.168.5.43:8000 (wifi)
   try {
     final response = await http.post(
-      Uri.parse(loginUrl),
+      Uri.parse(ApiConstants.loginUser),
       body: {
         'UserEmail': email,
         'UserPassword': password,
       },
     );
-    print(response.body); // To check the response
+    print(response.body);
+
+    var userData = jsonDecode(response.body);
+    Map<String, dynamic> userDetails = userData['data'];
+    // To check the response
 
     // Check if the response status is 200
     if (response.statusCode == 200) {
@@ -45,19 +50,13 @@ void _handleLogin(BuildContext context, String email, String password) async {
         // Extract user data properly from the 'data' field
         final userData = data['data'];
 
-        print("userData from login func: $userData ");
+        print("userData from login func SUCCESS: $userData ");
         // Navigate to the next screen on successful login
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MainTabView(userData: {
-              'firstname': userData['UserFirstName'],
-              'lastname': userData['UserLastName'],
-              'email': userData['UserEmail'],
-              'gender': userData['UserGender'],
-              'weight': userData['UserWeight'.toString()],
-              'height': userData['UserHeight'.toString()],
-            }), // Adjust as needed
+            builder: (context) =>
+                MainTabView(userData: userDetails), // Adjust as needed
           ),
         );
 

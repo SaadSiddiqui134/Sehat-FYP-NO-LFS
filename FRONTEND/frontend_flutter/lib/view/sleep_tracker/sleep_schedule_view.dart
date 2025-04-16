@@ -1,15 +1,17 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:calendar_agenda/calendar_agenda.dart';
 import 'package:fitness/view/sleep_tracker/sleep_add_alarm_view.dart';
-
 import 'package:flutter/material.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
-
+import 'package:fitness/api_constants.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/today_sleep_schedule_row.dart';
 
 class SleepScheduleView extends StatefulWidget {
-  const SleepScheduleView({super.key});
+  final Map<String, dynamic>? userData;
+  const SleepScheduleView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<SleepScheduleView> createState() => _SleepScheduleViewState();
@@ -37,14 +39,36 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
 
   List<int> showingTooltipOnSpots = [4];
 
+  List<dynamic> userSleepLogs = [];
+
   @override
   void initState() {
     super.initState();
     _selectedDateAppBBar = DateTime.now();
+    fetchSleepLogs();
+  }
+
+  Future<void> fetchSleepLogs() async {
+    final userIDForSleepLogs = widget.userData?['UserID'];
+    final response = await http
+        .get(Uri.parse(ApiConstants.getSleepLogsUser(userIDForSleepLogs)));
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      setState(() {
+        userSleepLogs =
+            jsonResponse['data']; // <-- assuming backend returns a list here
+      });
+    } else {
+      print("Failed to load sleep logs");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // int userIDForSleepLogs = widget.userData?['userID'];
+    // final userSleepLogs =
+    //     Uri.parse(ApiConstants.getSleepLogsUser(userIDForSleepLogs));
     var media = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -122,7 +146,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const SizedBox(
                                 height: 15,
@@ -134,6 +158,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                   fontSize: 14,
                                 ),
                               ),
+                              const Spacer(),
                               Text(
                                 "8hours 30minutes",
                                 style: TextStyle(
@@ -152,8 +177,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                               )
                             ]),
                         Image.asset(
-                          "assets/img/sleep_schedule.png",
-                          width: media.width * 0.35,
+                          "assets/img/sleep_timer.png",
+                          width: media.width * 0.25,
                         )
                       ],
                     ),
@@ -165,79 +190,118 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  child: Text(
-                    "Your Schedule",
-                    style: TextStyle(
-                        color: TColor.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700),
-                  ),
+                  // child: Text(
+                  //   "Your Schedule",
+                  //   style: TextStyle(
+                  //       color: TColor.black,
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.w700),
+                  // ),
                 ),
-                CalendarAgenda(
-                  controller: _calendarAgendaControllerAppBar,
-                  appbar: false,
-                  selectedDayPosition: SelectedDayPosition.center,
-                  leading: IconButton(
-                      onPressed: () {},
-                      icon: Image.asset(
-                        "assets/img/ArrowLeft.png",
-                        width: 15,
-                        height: 15,
-                      )),
-                  training: IconButton(
-                      onPressed: () {},
-                      icon: Image.asset(
-                        "assets/img/ArrowRight.png",
-                        width: 15,
-                        height: 15,
-                      )),
-                  weekDay: WeekDay.short,
-                  dayNameFontSize: 12,
-                  dayNumberFontSize: 16,
-                  dayBGColor: Colors.grey.withOpacity(0.15),
-                  titleSpaceBetween: 15,
-                  backgroundColor: Colors.transparent,
-                  // fullCalendar: false,
-                  fullCalendarScroll: FullCalendarScroll.horizontal,
-                  fullCalendarDay: WeekDay.short,
-                  selectedDateColor: Colors.white,
-                  dateColor: Colors.black,
-                  locale: 'en',
+                // CalendarAgenda(
+                //   controller: _calendarAgendaControllerAppBar,
+                //   appbar: false,
+                //   selectedDayPosition: SelectedDayPosition.center,
+                //   leading: IconButton(
+                //       onPressed: () {},
+                //       icon: Image.asset(
+                //         "assets/img/ArrowLeft.png",
+                //         width: 15,
+                //         height: 15,
+                //       )),
+                //   training: IconButton(
+                //       onPressed: () {},
+                //       icon: Image.asset(
+                //         "assets/img/ArrowRight.png",
+                //         width: 15,
+                //         height: 15,
+                //       )),
+                //   weekDay: WeekDay.short,
+                //   dayNameFontSize: 12,
+                //   dayNumberFontSize: 16,
+                //   dayBGColor: Colors.grey.withOpacity(0.15),
+                //   titleSpaceBetween: 15,
+                //   backgroundColor: Colors.transparent,
+                //   // fullCalendar: false,
+                //   fullCalendarScroll: FullCalendarScroll.horizontal,
+                //   fullCalendarDay: WeekDay.short,
+                //   selectedDateColor: Colors.white,
+                //   dateColor: Colors.black,
+                //   locale: 'en',
 
-                  initialDate: DateTime.now(),
-                  calendarEventColor: TColor.primaryColor2,
-                  firstDate: DateTime.now().subtract(const Duration(days: 140)),
-                  lastDate: DateTime.now().add(const Duration(days: 60)),
+                //   initialDate: DateTime.now(),
+                //   calendarEventColor: TColor.primaryColor2,
+                //   firstDate: DateTime.now().subtract(const Duration(days: 140)),
+                //   lastDate: DateTime.now().add(const Duration(days: 60)),
 
-                  onDateSelected: (date) {
-                    _selectedDateAppBBar = date;
-                  },
-                  selectedDayLogo: Container(
-                    width: double.maxFinite,
-                    height: double.maxFinite,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: TColor.primaryG,
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                ),
+                //   onDateSelected: (date) {
+                //     _selectedDateAppBBar = date;
+                //   },
+                //   selectedDayLogo: Container(
+                //     width: double.maxFinite,
+                //     height: double.maxFinite,
+                //     decoration: BoxDecoration(
+                //       gradient: LinearGradient(
+                //           colors: TColor.primaryG,
+                //           begin: Alignment.topCenter,
+                //           end: Alignment.bottomCenter),
+                //       borderRadius: BorderRadius.circular(10.0),
+                //     ),
+                //   ),
+                // ),
                 SizedBox(
                   height: media.width * 0.03,
                 ),
-                ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: todaySleepArr.length,
-                    itemBuilder: (context, index) {
-                      var sObj = todaySleepArr[index] as Map? ?? {};
-                      return TodaySleepScheduleRow(
-                        sObj: sObj,
-                      );
-                    }),
+
+                // ListView.builder(
+                //     padding: const EdgeInsets.symmetric(horizontal: 20),
+                //     physics: const NeverScrollableScrollPhysics(),
+                //     shrinkWrap: true,
+                //     itemCount: todaySleepArr.length,
+                //     itemBuilder: (context, index) {
+                //       var sObj = todaySleepArr[index] as Map? ?? {};
+                //       return TodaySleepScheduleRow(
+                //         sObj: sObj,
+                //       );
+                //     }),
+                Container(
+                  margin: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Color(
+                        0xFFF5F5F5), // light muted color (feel free to adjust)
+                    borderRadius: BorderRadius.circular(16), // rounded corners
+                    border: Border.all(
+                      color: Colors
+                          .grey.shade300, // subtle border to show boundary
+                      width: 1,
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columnSpacing: 20,
+                      columns: const [
+                        DataColumn(label: Text('Date')),
+                        DataColumn(label: Text('Sleep Start')),
+                        DataColumn(label: Text('Sleep End')),
+                        DataColumn(label: Text('Duration')),
+                      ],
+                      rows: userSleepLogs.map((log) {
+                        return DataRow(cells: [
+                          DataCell(Text(log.date)),
+                          DataCell(Text(log.sleepStart)),
+                          DataCell(Text(log.sleepEnd)),
+                          DataCell(Text(log.duration)),
+                        ]);
+                      }).toList(),
+                    ),
+                  ),
+                ),
+
+                SizedBox(
+                  height: media.width * 0.03,
+                ),
                 Container(
                     width: double.maxFinite,
                     margin: const EdgeInsets.symmetric(

@@ -14,7 +14,7 @@ import 'package:fitness/view/workout_tracker/workout_tracker_view.dart';
 import 'package:fitness/view/meal_planner/meal_planner_view.dart';
 
 class HomeView extends StatefulWidget {
-  final Map<String, String>? userData;
+  final Map<String, dynamic>? userData;
   const HomeView({Key? key, this.userData}) : super(key: key);
 
   @override
@@ -140,7 +140,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-
+    final u_id = widget.userData?['userID'];
     final firstName = widget.userData?['firstname'] ?? 'Guest';
     final lastname = widget.userData?['lastname'] ?? ' ';
     final email = widget.userData?['email'] ?? ' email@gmail.com';
@@ -308,8 +308,8 @@ class _HomeViewState extends State<HomeView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const WorkoutTrackerView(),
+                                builder: (context) => WorkoutTrackerView(
+                                    userData: widget.userData),
                               ),
                             );
                           }),
@@ -322,7 +322,8 @@ class _HomeViewState extends State<HomeView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MealPlannerView(),
+                                builder: (context) =>
+                                    MealPlannerView(userData: widget.userData),
                               ),
                             );
                           }),
@@ -335,7 +336,8 @@ class _HomeViewState extends State<HomeView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const SleepTrackerView(),
+                                builder: (context) =>
+                                    SleepTrackerView(userData: widget.userData),
                               ),
                             );
                           })

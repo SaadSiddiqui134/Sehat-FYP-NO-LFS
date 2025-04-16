@@ -8,7 +8,8 @@ import '../../common_widget/upcoming_workout_row.dart';
 import '../../common_widget/what_train_row.dart';
 
 class WorkoutTrackerView extends StatefulWidget {
-  const WorkoutTrackerView({super.key});
+  final Map<String, dynamic>? userData;
+  const WorkoutTrackerView({Key? key, this.userData}) : super(key: key);
 
   @override
   State<WorkoutTrackerView> createState() => _WorkoutTrackerViewState();
@@ -342,10 +343,15 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       itemBuilder: (context, index) {
                         var wObj = whatArr[index] as Map? ?? {};
                         return InkWell(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  WorkoutDetailView( dObj: wObj, ) ));
-                          },
-                          child:  WhatTrainRow(wObj: wObj) );
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => WorkoutDetailView(
+                                            dObj: wObj,
+                                          )));
+                            },
+                            child: WhatTrainRow(wObj: wObj));
                       }),
                   SizedBox(
                     height: media.width * 0.1,

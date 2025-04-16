@@ -8,6 +8,7 @@ import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fitness/api_constants.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -16,6 +17,7 @@ class SignUpView extends StatefulWidget {
   State<SignUpView> createState() => _SignUpViewState();
 }
 
+//CreateUSer Functionality
 void _handleSignup(
     BuildContext context,
     String firstname,
@@ -25,15 +27,9 @@ void _handleSignup(
     String gender,
     String weight,
     String height_cm) async {
-  const String SignupUrl = 'http://192.168.87.188w:8000/user/create/';
-
-  // 192.168.81.188 (hotspot me)
-
-  // 192.168.5.43:8000 (wifi)
-
   try {
     final response = await http.post(
-      Uri.parse(SignupUrl),
+      Uri.parse(ApiConstants.createUser),
       body: {
         'UserFirstName': firstname,
         'UserLastName': lastname,
@@ -55,7 +51,7 @@ void _handleSignup(
         context,
         MaterialPageRoute(
             builder: (context) => LoginView(
-                  userData: {
+                  userDataFromSignup: {
                     'firstname': firstname,
                     'lastname': lastname,
                     'email': email,
@@ -77,7 +73,7 @@ void _handleSignup(
     print("Error: ${e.toString()}"); // Log the error message
     // Handle network errors
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('An error occured. Check logs')),
+      SnackBar(content: Text("$e")),
     );
   }
 }
