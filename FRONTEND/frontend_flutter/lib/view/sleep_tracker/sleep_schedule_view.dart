@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
+import 'package:fitness/view/sleep_tracker/add_sleepLog_form.dart';
 import 'package:http/http.dart' as http;
 import 'package:calendar_agenda/calendar_agenda.dart';
-import 'package:fitness/view/sleep_tracker/sleep_add_alarm_view.dart';
+import 'package:fitness/view/sleep_tracker/add_sleepLog_form.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:fitness/api_constants.dart';
@@ -20,7 +22,7 @@ class SleepScheduleView extends StatefulWidget {
 class _SleepScheduleViewState extends State<SleepScheduleView> {
   CalendarAgendaController _calendarAgendaControllerAppBar =
       CalendarAgendaController();
-  late DateTime _selectedDateAppBBar;
+  late DateTime _selectedDateAppBar;
 
   List todaySleepArr = [
     {
@@ -40,35 +42,102 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
   List<int> showingTooltipOnSpots = [4];
 
   List<dynamic> userSleepLogs = [];
-
+  int latestHours = 0;
+  int latestMinutes = 0;
+  double latestRatio = 0.0;
   @override
   void initState() {
     super.initState();
-    _selectedDateAppBBar = DateTime.now();
+    _selectedDateAppBar = DateTime.now();
+
     fetchSleepLogs();
   }
 
   Future<void> fetchSleepLogs() async {
     final userIDForSleepLogs = widget.userData?['UserID'];
-    final response = await http
-        .get(Uri.parse(ApiConstants.getSleepLogsUser(userIDForSleepLogs)));
+    try {
+      final response = await http
+          .get(Uri.parse(ApiConstants.getSleepLogsUser(userIDForSleepLogs)));
 
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
+      print("response GET sleepLog code: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        var data = jsonResponse['data'];
+
+        if (data is List && data.isNotEmpty) {
+          // Sort the data by date (most recent first)
+          data.sort((a, b) {
+            try {
+              // Assuming date format is YYYY-MM-DD
+              DateTime dateA = DateTime.parse(a['date'] ?? "");
+              DateTime dateB = DateTime.parse(b['date'] ?? "");
+              return dateB.compareTo(dateA); // Descending order
+            } catch (e) {
+              print(
+                  "Error parsing date during sort in fetchSleepLogs: $e, Data: a=${a['date']}, b=${b['date']}");
+            }
+            return 0;
+          });
+
+          // Calculate based on the first item AFTER sorting
+          final latestLog = data.first;
+          final hours = latestLog?['duration_hours'] ?? 0;
+          final minutes = latestLog?['duration_minutes'] ?? 0;
+          final totalMinutes = hours * 60 + minutes;
+          final idealMinutes = 8 * 60 + 30; // 510
+          final ratio = (totalMinutes / idealMinutes).clamp(0.0, 1.0);
+
+          setState(() {
+            userSleepLogs = List<dynamic>.from(data);
+            latestHours = hours;
+            latestMinutes = minutes;
+            latestRatio = ratio;
+          });
+        } else {
+          // Handle empty data case
+          setState(() {
+            userSleepLogs = [];
+            latestHours = 0;
+            latestMinutes = 0;
+            latestRatio = 0.0;
+          });
+        }
+      } else {
+        print("Failed to load sleep logs: ${response.statusCode}");
+        setState(() {
+          userSleepLogs = [];
+          latestHours = 0;
+          latestMinutes = 0;
+          latestRatio = 0.0;
+        });
+      }
+    } catch (e) {
+      print("Error fetching or processing sleep logs: $e");
       setState(() {
-        userSleepLogs =
-            jsonResponse['data']; // <-- assuming backend returns a list here
+        userSleepLogs = [];
+        latestHours = 0;
+        latestMinutes = 0;
+        latestRatio = 0.0;
       });
-    } else {
-      print("Failed to load sleep logs");
+    }
+  }
+
+  String formatTime(String? iso) {
+    if (iso == null) return '';
+    try {
+      final time = DateTime.parse(iso);
+      final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
+      final minute = time.minute.toString().padLeft(2, '0');
+      final period = time.hour >= 12 ? 'PM' : 'AM';
+      return '$hour:$minute $period';
+    } catch (e) {
+      return iso;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // int userIDForSleepLogs = widget.userData?['userID'];
-    // final userSleepLogs =
-    //     Uri.parse(ApiConstants.getSleepLogsUser(userIDForSleepLogs));
     var media = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -139,7 +208,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                     decoration: BoxDecoration(
                         gradient: LinearGradient(colors: [
                           TColor.primaryColor2.withOpacity(0.4),
-                          TColor.primaryColor1.withOpacity(0.4)
+                          TColor.primaryColor1.withOpacity(0.4),
                         ]),
                         borderRadius: BorderRadius.circular(20)),
                     child: Row(
@@ -156,6 +225,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                 style: TextStyle(
                                   color: TColor.black,
                                   fontSize: 14,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                               const Spacer(),
@@ -167,14 +237,6 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                     fontWeight: FontWeight.w500),
                               ),
                               const Spacer(),
-                              SizedBox(
-                                width: 110,
-                                height: 35,
-                                child: RoundButton(
-                                    title: "Learn More",
-                                    fontSize: 12,
-                                    onPressed: () {}),
-                              )
                             ]),
                         Image.asset(
                           "assets/img/sleep_timer.png",
@@ -249,9 +311,9 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                 //     ),
                 //   ),
                 // ),
-                SizedBox(
-                  height: media.width * 0.03,
-                ),
+                //  SizedBox(
+                //     height: media.width * 0.03,
+                //   ),
 
                 // ListView.builder(
                 //     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -268,32 +330,127 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                   margin: EdgeInsets.all(16),
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Color(
-                        0xFFF5F5F5), // light muted color (feel free to adjust)
-                    borderRadius: BorderRadius.circular(16), // rounded corners
-                    border: Border.all(
-                      color: Colors
-                          .grey.shade300, // subtle border to show boundary
-                      width: 1,
-                    ),
+                    color: TColor.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 2,
+                        blurRadius: 10,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      columnSpacing: 20,
-                      columns: const [
-                        DataColumn(label: Text('Date')),
-                        DataColumn(label: Text('Sleep Start')),
-                        DataColumn(label: Text('Sleep End')),
-                        DataColumn(label: Text('Duration')),
+                      headingRowHeight: 50,
+                      dataRowHeight: 56,
+                      horizontalMargin: 24,
+                      columnSpacing: 30,
+                      headingRowColor: MaterialStateProperty.all(
+                          TColor.primaryColor2.withOpacity(0.1)),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      columns: [
+                        DataColumn(
+                          label: Text(
+                            'Date',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: TColor.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Sleep Start',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: TColor.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Sleep End',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: TColor.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Duration',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: TColor.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
                       ],
                       rows: userSleepLogs.map((log) {
-                        return DataRow(cells: [
-                          DataCell(Text(log.date)),
-                          DataCell(Text(log.sleepStart)),
-                          DataCell(Text(log.sleepEnd)),
-                          DataCell(Text(log.duration)),
-                        ]);
+                        final date = log['date'] ?? '';
+                        final start = formatTime(log['sleep_start']);
+                        final end = formatTime(log['sleep_end']);
+                        final duration =
+                            '${log['duration_hours'] ?? 0}h ${log['duration_minutes'] ?? 0}m';
+
+                        return DataRow(
+                          cells: [
+                            DataCell(
+                              Text(
+                                date,
+                                style: TextStyle(
+                                  color: TColor.black.withOpacity(0.7),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                start,
+                                style: TextStyle(
+                                  color: TColor.black.withOpacity(0.7),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                end,
+                                style: TextStyle(
+                                  color: TColor.black.withOpacity(0.7),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: TColor.primaryColor2.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Text(
+                                  duration,
+                                  style: TextStyle(
+                                    color: TColor.primaryColor2,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
                       }).toList(),
                     ),
                   ),
@@ -302,6 +459,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                 SizedBox(
                   height: media.width * 0.03,
                 ),
+
                 Container(
                     width: double.maxFinite,
                     margin: const EdgeInsets.symmetric(
@@ -317,7 +475,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "You will get 8hours 10minutes\nfor tonight",
+                          "You will get ${latestHours}hrs and ${latestMinutes} min"
+                          "\nfor tonight",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 12,
@@ -334,10 +493,10 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                               width: media.width - 80,
                               backgroundColor: Colors.grey.shade100,
                               foregrondColor: Colors.purple,
-                              ratio: 0.96,
+                              ratio: latestRatio,
                               direction: Axis.horizontal,
                               curve: Curves.fastLinearToSlowEaseIn,
-                              duration: const Duration(seconds: 3),
+                              duration: const Duration(seconds: 1),
                               borderRadius: BorderRadius.circular(7.5),
                               gradientColor: LinearGradient(
                                   colors: TColor.secondaryG,
@@ -345,7 +504,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                   end: Alignment.centerRight),
                             ),
                             Text(
-                              "96%",
+                              "${(latestRatio * 100).toStringAsFixed(0)}%",
                               style: TextStyle(
                                 color: TColor.black,
                                 fontSize: 12,
@@ -368,9 +527,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => SleepAddAlarmView(
-                date: _selectedDateAppBBar,
-              ),
+              builder: (context) => SleepAddAlarmView2(
+                  date: _selectedDateAppBar, userData: widget.userData),
             ),
           );
         },

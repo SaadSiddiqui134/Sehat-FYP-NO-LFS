@@ -20,10 +20,12 @@ class ApiConstants {
   static final String getUserDetails2 = '$baseUrlDevice/user/details/';
 
   // ---------------- SLEEP TRACKER MODULE ----------------
-  static const String logSleep = '$baseUrl/sleep/log/';
-  static const String getSleepLogs = '$baseUrl/sleep/all/';
-  static const String getSleepStats = '$baseUrl/sleep/stats/';
-  static String getSleepLogsUser(int id) => '$baseUrl/sleep/$id/';
+  static const String logSleep = '$baseUrl/sleep/sleepadd/';
+  // static const String getSleepLogs = '$baseUrl/sleep/sleepGetByUser/$id';
+  static String getSleepLogsUserChart(int userIDForSleepChart) =>
+      '$baseUrl/sleep/sleepLineChart/$userIDForSleepChart';
+  static String getSleepLogsUser(int userIDForSleepLogs) =>
+      '$baseUrl/sleep/sleepGetByUser/$userIDForSleepLogs';
 
   static final String logSleep2 = '$baseUrlDevice/sleep/log/';
   static final String getSleepLogs2 = '$baseUrlDevice/sleep/all/';
