@@ -12,6 +12,7 @@ import 'notification_view.dart';
 import '../sleep_tracker/sleep_tracker_view.dart';
 import 'package:fitness/view/workout_tracker/workout_tracker_view.dart';
 import 'package:fitness/view/meal_planner/meal_planner_view.dart';
+import 'package:fitness/view/disease/disease_home.dart';
 import 'dart:math' as math;
 
 class HomeView extends StatefulWidget {
@@ -183,6 +184,15 @@ class _HomeViewState extends State<HomeView>
     final weight = double.tryParse(widget.userData?['weight'] ?? '80') ?? 80;
     final heightInCm =
         double.tryParse(widget.userData?['height'] ?? '170') ?? 170;
+
+    // Calculate BMI
+    final bmi = weight / (heightInCm / 100 * heightInCm / 100);
+
+    // Create a new map with all existing userData plus BMI
+    final updatedUserData = {
+      ...?widget.userData,
+      'calculatedBMI': bmi.toStringAsFixed(2),
+    };
 
     final lineBarsData = [
       LineChartBarData(
@@ -438,6 +448,20 @@ class _HomeViewState extends State<HomeView>
                             MaterialPageRoute(
                               builder: (context) =>
                                   SleepTrackerView(userData: widget.userData),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        _buildNavigationCard(
+                          "Disease Management",
+                          "Track and manage your health conditions",
+                          Icons.medical_services,
+                          TColor.secondaryColor1,
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DiseaseHomeView(userData: updatedUserData),
                             ),
                           ),
                         ),
