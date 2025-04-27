@@ -32,7 +32,10 @@ class ApiConstants {
   static final String getSleepStats2 = '$baseUrlDevice/sleep/stats/';
 
   // ---------------- DISEASE MODULE ----------------
-  static const String predictDisease = '$baseUrl/disease/predict/';
+  static const String predictDiseaseDiabetes =
+      '$baseUrl/disease/predict/diabetes/';
+  static const String predictDiseaseHypertension =
+      '$baseUrl/disease/predict/hypertension/';
   static const String diseaseHistory = '$baseUrl/disease/history/';
 
   static final String predictDisease2 = '$baseUrlDevice/disease/predict/';
