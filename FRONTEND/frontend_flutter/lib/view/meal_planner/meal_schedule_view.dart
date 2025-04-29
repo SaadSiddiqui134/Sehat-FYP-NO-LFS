@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 
 import '../../common/colo_extension.dart';
-import '../../common_widget/meal_food_schedule_row.dart';
 import '../../common_widget/nutritions_row.dart';
 
 class MealScheduleView extends StatefulWidget {
@@ -40,14 +39,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
       "image": "assets/img/glass-of-milk 1.png"
     },
   ];
-  List snacksArr = [
-    {"name": "Orange", "time": "04:30pm", "image": "assets/img/orange.png"},
-    {
-      "name": "Apple Pie",
-      "time": "04:40pm",
-      "image": "assets/img/apple_pie.png"
-    },
-  ];
+
   List dinnerArr = [
     {"name": "Salad", "time": "07:10pm", "image": "assets/img/salad.png"},
     {"name": "Oatmeal", "time": "08:10pm", "image": "assets/img/oatmeal.png"},
@@ -119,7 +111,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
           ),
         ),
         title: Text(
-          "Meal  Schedule",
+          "Meal Schedule",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -233,10 +225,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
                     itemCount: breakfastArr.length,
                     itemBuilder: (context, index) {
                       var mObj = breakfastArr[index] as Map? ?? {};
-                      return MealFoodScheduleRow(
-                        mObj: mObj,
-                        index: index,
-                      );
+                      return _buildMealRow(mObj, index);
                     }),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -267,44 +256,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
                     itemCount: lunchArr.length,
                     itemBuilder: (context, index) {
                       var mObj = lunchArr[index] as Map? ?? {};
-                      return MealFoodScheduleRow(
-                        mObj: mObj,
-                        index: index,
-                      );
-                    }),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Snacks",
-                        style: TextStyle(
-                            color: TColor.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "${snacksArr.length} Items | 140 calories",
-                          style: TextStyle(color: TColor.gray, fontSize: 12),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: snacksArr.length,
-                    itemBuilder: (context, index) {
-                      var mObj = snacksArr[index] as Map? ?? {};
-                      return MealFoodScheduleRow(
-                        mObj: mObj,
-                        index: index,
-                      );
+                      return _buildMealRow(mObj, index);
                     }),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -335,10 +287,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
                     itemCount: dinnerArr.length,
                     itemBuilder: (context, index) {
                       var mObj = dinnerArr[index] as Map? ?? {};
-                      return MealFoodScheduleRow(
-                        mObj: mObj,
-                        index: index,
-                      );
+                      return _buildMealRow(mObj, index);
                     }),
                 SizedBox(
                   height: media.width * 0.05,
@@ -379,5 +328,28 @@ class _MealScheduleViewState extends State<MealScheduleView> {
         ],
       ),
     );
+  }
+
+  Widget _buildMealRow(Map mObj, int index) {
+    return Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: TColor.lightGray,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                mObj["name"].toString(),
+                style: TextStyle(
+                    color: TColor.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ));
   }
 }

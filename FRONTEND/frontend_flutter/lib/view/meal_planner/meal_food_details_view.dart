@@ -57,7 +57,7 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
     {
       "name": "Blueberry Pancake",
       "image": "assets/img/f_1.png",
-      "b_image":"assets/img/pancake_1.png",
+      "b_image": "assets/img/pancake_1.png",
       "size": "Medium",
       "time": "30mins",
       "kcal": "230kCal"
@@ -65,7 +65,7 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
     {
       "name": "Salmon Nigiri",
       "image": "assets/img/f_2.png",
-       "b_image": "assets/img/nigiri.png",
+      "b_image": "assets/img/nigiri.png",
       "size": "Medium",
       "time": "20mins",
       "kcal": "120kCal"
@@ -151,45 +151,31 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
           children: [
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
-                  color: TColor.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 2,
-                        offset: Offset(0, 1))
-                  ]),
+                color: TColor.lightGray,
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Row(
                 children: [
-                  Expanded(
-                      child: TextField(
-                    controller: txtSearch,
-                    decoration: InputDecoration(
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        prefixIcon: Image.asset(
-                          "assets/img/search.png",
-                          width: 25,
-                          height: 25,
-                        ),
-                        hintText: "Search Pancake"),
-                  )),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    width: 1,
-                    height: 25,
-                    color: TColor.gray.withOpacity(0.3),
+                  Icon(
+                    Icons.search,
+                    color: TColor.gray,
+                    size: 20,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    child: Image.asset(
-                      "assets/img/Filter.png",
-                      width: 25,
-                      height: 25,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Search food",
+                        hintStyle: TextStyle(
+                          color: TColor.gray,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
