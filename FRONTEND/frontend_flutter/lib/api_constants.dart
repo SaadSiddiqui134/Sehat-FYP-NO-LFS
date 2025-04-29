@@ -1,10 +1,15 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConstants {
+  static const String apiUrl =
+      'https://api.calorieninjas.com/v1/nutrition?query='; // emulator
   // Change this one line to switch environments
   static const String baseUrl = 'http://10.0.2.2:8000'; // emulator
   static final String baseUrlDevice = dotenv.env['DEVICE_IP'] ??
       'http://10.0.2.2:8000/user/login/'; // real device
+
+  // Add this line for the API key
+  static final String apiKey = dotenv.env['API_KEY'] ?? '';
 
   // ---------------- USER MODULE ----------------
   static const String createUser = '$baseUrl/user/create/';
@@ -41,12 +46,17 @@ class ApiConstants {
   static final String predictDisease2 = '$baseUrlDevice/disease/predict/';
   static final String diseaseHistory2 = '$baseUrlDevice/disease/history/';
 
-  // ---------------- HEALTH MODULE ----------------
-  static final String logVitals = '$baseUrl/health/log/';
-  static final String getVitals = '$baseUrl/health/data/';
-  static final String getHealthStats = '$baseUrl/health/stats/';
+  // ---------------- NUTRITION TRACKER MODULE ----------------
+  static final String logMealsCalories = '$baseUrl/meals/logCalories/';
+  static final String logMeals = '$baseUrl/meals/log/';
+  static final String mealsData = '$baseUrl/meals/getData/';
 
-  static final String logVitals2 = '$baseUrlDevice/health/log/';
-  static final String getVitals2 = '$baseUrlDevice/health/data/';
-  static final String getHealthStats2 = '$baseUrlDevice/health/stats/';
+  // Updated to accept parameters
+  static String mealsDataByDate(int userId, String formattedDate) =>
+      '$baseUrl/meals/getData/date/?date=$formattedDate&user_id=$userId';
+
+  static final String logMeals2 = '$baseUrlDevice/meals/log/';
+  static final String mealsData2 = '$baseUrlDevice/meals/getData/';
+  static String mealsDataByDate2(int userId, String formattedDate) =>
+      '$baseUrlDevice/meals/getData/date/?date=$formattedDate&user_id=$userId';
 }
