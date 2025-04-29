@@ -426,13 +426,25 @@ class _HomeViewState extends State<HomeView>
                                 "Plan your nutrition",
                                 Icons.restaurant_menu,
                                 TColor.secondaryColor1,
-                                () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MealPlannerView(
-                                        userData: widget.userData),
-                                  ),
-                                ),
+                                () {
+                                  // Create an updated userData map that includes BMI
+                                  final bmi = weight /
+                                      (heightInCm / 100 * heightInCm / 100);
+                                  final updatedUserData = {
+                                    ...?widget.userData,
+                                    'calculatedBMI': bmi.toStringAsFixed(2),
+                                    'weight': weight.toString(),
+                                    'height': heightInCm.toString(),
+                                  };
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MealPlannerView(
+                                          userData: updatedUserData),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],
