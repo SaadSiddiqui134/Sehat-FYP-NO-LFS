@@ -7,4 +7,5 @@ urlpatterns = [
     path('user/', include('userManagement.urls')),
     path('sleep/', include('sleep_tracker.urls')),
     path('disease/', include('mlmodels.urls')),
+    path('meals/', include('nurition_tracker.urls')),
 ]
