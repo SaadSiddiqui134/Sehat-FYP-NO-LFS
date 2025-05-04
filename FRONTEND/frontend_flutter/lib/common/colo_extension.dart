@@ -22,4 +22,5 @@ class TColor {
   static Color get gray => hexToColor('#3C3D37');
   static Color get white => Colors.white;
   static Color get lightGray => hexToColor('#F7F8F8');
+  static Color get lightGray2 => hexToColor('#F7F8F8');
 }
