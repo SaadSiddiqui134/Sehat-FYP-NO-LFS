@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-
+import '../home/home_view.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import '../login/login_view.dart';
+import '../profile/contact_us.dart';
+import '../profile/privacy_policy.dart';
 
 class ProfileView extends StatefulWidget {
   final Map<String, dynamic>? userData;
@@ -24,354 +27,308 @@ class _ProfileViewState extends State<ProfileView> {
       "image": "assets/img/p_activity.png",
       "name": "Activity History",
       "tag": "3"
-    },
-    {
-      "image": "assets/img/p_workout.png",
-      "name": "Workout Progress",
-      "tag": "4"
     }
   ];
 
   List otherArr = [
-    {"image": "assets/img/p_contact.png", "name": "Contact Us", "tag": "5"},
+    {"image": "assets/img/p_contact.png", "name": "About Us", "tag": "5"},
     {"image": "assets/img/p_privacy.png", "name": "Privacy Policy", "tag": "6"},
-    {"image": "assets/img/p_setting.png", "name": "Setting", "tag": "7"},
   ];
+
   @override
   Widget build(BuildContext context) {
-    final firstName = widget.userData?['firstname'] ?? 'Guest';
-    final lastname = widget.userData?['lastname'] ?? ' ';
-    final email = widget.userData?['email'] ?? ' email@gmail.com';
-    final gender = widget.userData?['gender'] ?? 'Male';
-    final weight = widget.userData?['weight'] ?? '80';
-    final heightInCm = widget.userData?['height'] ?? '170';
+    final firstName = widget.userData?['UserFirstName'] ?? 'Guest';
+    final lastname = widget.userData?['UserLastName'] ?? ' ';
+    final email = widget.userData?['UserEmail'] ?? ' email@gmail.com';
+    final gender = widget.userData?['UserGender'] ?? 'Male';
+    final weight = widget.userData?['UserWeight'] ?? '80';
+    final heightInCm = widget.userData?['UserHeight'] ?? '170';
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: TColor.white,
         centerTitle: true,
         elevation: 0,
-        leadingWidth: 0,
         title: Text(
           "Profile",
           style: TextStyle(
-              color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
+              color: TColor.primaryColor1,
+              fontSize: 20,
+              fontWeight: FontWeight.w700),
         ),
         actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: TColor.lightGray,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Image.asset(
-                "assets/img/more_btn.png",
-                width: 15,
-                height: 15,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.red),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginView()),
+              );
+            },
+          ),
         ],
       ),
-      backgroundColor: TColor.backgroundColor,
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: gender == "female"
-                          ? Image.asset(
-                              "assets/img/u2.png",
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              "assets/img/u1.png",
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "$firstName $lastname",
-                          style: TextStyle(
-                            color: TColor.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        // Text(
-                        //   "Lose a Fat Program",
-                        //   style: TextStyle(
-                        //     color: TColor.gray,
-                        //     fontSize: 12,
-                        //   ),
-                        // )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 70,
-                    height: 25,
-                    child: RoundButton(
-                      title: "Edit",
-                      type: RoundButtonType.bgGradient,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const ActivityTrackerView(),
-                        //   ),
-                        // );
-                      },
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TitleSubtitleCell(
-                      title: "$heightInCm cm",
-                      subtitle: "Height",
-                    ),
-                  ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: TitleSubtitleCell(
-                      title: "$weight kg",
-                      subtitle: "Weight",
-                    ),
-                  ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: TitleSubtitleCell(
-                      title: "$gender",
-                      subtitle: "Gender",
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                decoration: BoxDecoration(
+      backgroundColor: TColor.lightGray,
+      body: Container(
+        decoration: BoxDecoration(
+          color: TColor.lightGray,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Profile Header
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
                     color: TColor.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 2)
-                    ]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Account",
-                      style: TextStyle(
-                        color: TColor.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: TColor.primaryColor2.withOpacity(0.15),
+                        blurRadius: 12,
+                        offset: Offset(0, 6),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: accountArr.length,
-                      itemBuilder: (context, index) {
-                        var iObj = accountArr[index] as Map? ?? {};
-                        return SettingRow(
-                          icon: iObj["image"].toString(),
-                          title: iObj["name"].toString(),
-                          onPressed: () {},
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                decoration: BoxDecoration(
-                    color: TColor.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 2)
-                    ]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Notification",
-                      style: TextStyle(
-                        color: TColor.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: gender == "female"
+                            ? Image.asset(
+                                "assets/img/u2.png",
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                "assets/img/u1.png",
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    SizedBox(
-                      height: 30,
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Image.asset("assets/img/p_notification.png",
-                                height: 15, width: 15, fit: BoxFit.contain),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Pop-up Notification",
-                                style: TextStyle(
-                                  color: TColor.black,
-                                  fontSize: 12,
-                                ),
+                            Text(
+                              "$firstName $lastname",
+                              style: TextStyle(
+                                color: TColor.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            CustomAnimatedToggleSwitch<bool>(
-                              current: positive,
-                              values: [false, true],
-                              dif: 0.0,
-                              indicatorSize: Size.square(30.0),
-                              animationDuration:
-                                  const Duration(milliseconds: 200),
-                              animationCurve: Curves.linear,
-                              onChanged: (b) => setState(() => positive = b),
-                              iconBuilder: (context, local, global) {
-                                return const SizedBox();
-                              },
-                              defaultCursor: SystemMouseCursors.click,
-                              onTap: () => setState(() => positive = !positive),
-                              iconsTappable: false,
-                              wrapperBuilder: (context, global, child) {
-                                return Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Positioned(
-                                        left: 10.0,
-                                        right: 10.0,
-                                        height: 30.0,
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                colors: TColor.secondaryG),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(50.0)),
-                                          ),
-                                        )),
-                                    child,
-                                  ],
-                                );
-                              },
-                              foregroundIndicatorBuilder: (context, global) {
-                                return SizedBox.fromSize(
-                                  size: const Size(10, 10),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: TColor.white,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(50.0)),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                            color: Colors.black38,
-                                            spreadRadius: 0.05,
-                                            blurRadius: 1.1,
-                                            offset: Offset(0.0, 0.8))
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                            Text(
+                              email,
+                              style: TextStyle(
+                                color: TColor.secondaryColor1,
+                                fontSize: 13,
+                              ),
                             ),
-                          ]),
-                    )
-                  ],
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 70,
+                        height: 32,
+                        child: RoundButton(
+                          title: "Edit",
+                          type: RoundButtonType.bgGradient,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                decoration: BoxDecoration(
-                    color: TColor.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 2)
-                    ]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 18),
+                // Quick Info Row
+                Row(
                   children: [
-                    Text(
-                      "Other",
-                      style: TextStyle(
-                        color: TColor.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                    Expanded(
+                      child: TitleSubtitleCell(
+                        title: "$heightInCm cm",
+                        subtitle: "Height",
                       ),
                     ),
-                    const SizedBox(
-                      height: 8,
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: TitleSubtitleCell(
+                        title: "$weight kg",
+                        subtitle: "Weight",
+                      ),
                     ),
-                    ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: otherArr.length,
-                      itemBuilder: (context, index) {
-                        var iObj = otherArr[index] as Map? ?? {};
-                        return SettingRow(
-                          icon: iObj["image"].toString(),
-                          title: iObj["name"].toString(),
-                          onPressed: () {},
-                        );
-                      },
-                    )
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: TitleSubtitleCell(
+                        title: "$gender",
+                        subtitle: "Gender",
+                      ),
+                    ),
                   ],
                 ),
-              )
-            ],
+                const SizedBox(height: 22),
+                // Account Section
+                _buildSectionCard(
+                  title: "Account",
+                  children: List.generate(accountArr.length, (index) {
+                    var iObj = accountArr[index] as Map? ?? {};
+                    return SettingRow(
+                      icon: iObj["image"].toString(),
+                      title: iObj["name"].toString(),
+                      onPressed: () {},
+                    );
+                  }),
+                ),
+                const SizedBox(height: 18),
+                // Notification Section
+                _buildSectionCard(
+                  title: "Notification",
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset("assets/img/p_notification.png",
+                            height: 18, width: 18, fit: BoxFit.contain),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Text(
+                            "Pop-up Notification",
+                            style: TextStyle(
+                              color: TColor.black,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        CustomAnimatedToggleSwitch<bool>(
+                          current: positive,
+                          values: [false, true],
+                          dif: 0.0,
+                          indicatorSize: Size.square(30.0),
+                          animationDuration: const Duration(milliseconds: 200),
+                          animationCurve: Curves.linear,
+                          onChanged: (b) => setState(() => positive = b),
+                          iconBuilder: (context, local, global) {
+                            return const SizedBox();
+                          },
+                          defaultCursor: SystemMouseCursors.click,
+                          onTap: () => setState(() => positive = !positive),
+                          iconsTappable: false,
+                          wrapperBuilder: (context, global, child) {
+                            return Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Positioned(
+                                    left: 10.0,
+                                    right: 10.0,
+                                    height: 30.0,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: TColor.secondaryColor1,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(50.0)),
+                                      ),
+                                    )),
+                                child,
+                              ],
+                            );
+                          },
+                          foregroundIndicatorBuilder: (context, global) {
+                            return SizedBox.fromSize(
+                              size: const Size(10, 10),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: TColor.white,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(50.0)),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                        color: Colors.black38,
+                                        spreadRadius: 0.05,
+                                        blurRadius: 1.1,
+                                        offset: Offset(0.0, 0.8))
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                // Other Section
+                _buildSectionCard(
+                  title: "Other",
+                  children: List.generate(otherArr.length, (index) {
+                    var iObj = otherArr[index] as Map? ?? {};
+                    return SettingRow(
+                      icon: iObj["image"].toString(),
+                      title: iObj["name"].toString(),
+                      onPressed: () {
+                        if (iObj["name"] == "About Us") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ContactUs()),
+                          );
+                        } else if (iObj["name"] == "Privacy Policy") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PrivacyPolicy()),
+                          );
+                        }
+                      },
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(
+      {required String title, required List<Widget> children}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 2),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+      decoration: BoxDecoration(
+        color: TColor.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: TColor.primaryColor2.withOpacity(0.08),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: TColor.primaryColor1,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...children,
+        ],
       ),
     );
   }
