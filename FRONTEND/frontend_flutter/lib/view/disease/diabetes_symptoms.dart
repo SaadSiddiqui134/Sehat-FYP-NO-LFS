@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../api_constants.dart';
+import 'diabetes_output.dart';
 
 class DiabetesSymptomsView extends StatefulWidget {
   final Map<String, dynamic>? userData;
@@ -212,39 +213,15 @@ class _DiabetesSymptomsViewState extends State<DiabetesSymptomsView> {
                           final prediction = responseData['prediction'];
 
                           // Show result dialog
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Prediction Result'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      prediction == 1
-                                          ? 'You may have diabetes.'
-                                          : 'You likely don\'t have diabetes.',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: prediction == 1
-                                            ? Colors.red
-                                            : Colors.green,
-                                      ),
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                        'Please consult with a healthcare professional for a proper diagnosis.'),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('OK'),
-                                  )
-                                ],
-                              );
-                            },
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DiabetesOutputView(
+                                prediction: prediction.toString(),
+                                userData: widget.userData!,
+                                inputData: requestData,
+                              ),
+                            ),
                           );
                         } else {
                           // Show error dialog
