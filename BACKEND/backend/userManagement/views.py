@@ -93,12 +93,8 @@ def login_user(request):
         try:
             # Find the user by email
             user_obj = User.objects.get(UserEmail=email)
-            user_obj.UserPassword = make_password(password)
-            user_obj.save()
-            user_obj.UserWeight = str(user_obj.UserWeight)
-            user_obj.UserHeight = str(user_obj.UserHeight)
             
-            # Check if the password is correct (compare the plain password with the hashed password)
+            # Check if the password is correct
             if check_password(password, user_obj.UserPassword):
                 # User is authenticated, log them in
                 login(request, user_obj)
@@ -110,32 +106,23 @@ def login_user(request):
                         "UserLastName": user_obj.UserLastName, 
                         "UserEmail": user_obj.UserEmail, 
                         "UserGender": user_obj.UserGender, 
-                        "UserWeight": user_obj.UserWeight, 
-                        "UserHeight": user_obj.UserHeight
+                        "UserWeight": str(user_obj.UserWeight), 
+                        "UserHeight": str(user_obj.UserHeight)
                     },
                     "code": 200,
                 })
             else:
                 return JsonResponse({
                     "success": False,
-                    "error": {
-                        "code": "INVALID_CREDENTIALS",
-                        "message": "The email or password provided is incorrect."
-                    }
+                    "error": "Invalid email or password"
                 }, status=400)
         except User.DoesNotExist:
             return JsonResponse({
                 "success": False,
-                "error": {
-                    "code": "INVALID_CREDENTIALS",
-                    "message": "user doesnt exist."
-                }
+                "error": "User does not exist"
             }, status=400)
 
     return JsonResponse({
         "success": False,
-        "error": {
-            "code": "INVALID_METHOD",
-            "message": "Only POST requests are allowed."
-        }
+        "error": "Only POST requests are allowed"
     }, status=405)
