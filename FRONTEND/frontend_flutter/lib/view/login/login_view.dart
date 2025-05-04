@@ -22,10 +22,31 @@ class LoginView extends StatefulWidget {
 // final String ip = dotenv.env['IP_CONFIG'] ?? 'http://10.0.2.2:8000/user/login/';
 
 void _handleLogin(BuildContext context, String email, String password) async {
-  // print(ip);
-  // String loginUrl = "http://$ip:8000/user/login/"; // Update with actual URL
+  // Email validation using regex
+  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
-  // 192.168.5.43:8000 (wifi)
+  // Check if email is valid
+  if (!emailRegex.hasMatch(email)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Please enter a valid email address'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return; // Stop the function if email is invalid
+  }
+
+  // Check if password is empty
+  if (password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Password cannot be empty'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return; // Stop the function if password is empty
+  }
+
   try {
     final response = await http.post(
       Uri.parse(ApiConstants.loginUser),
@@ -36,60 +57,50 @@ void _handleLogin(BuildContext context, String email, String password) async {
     );
     print(response.body);
 
-    var userData = jsonDecode(response.body);
-    Map<String, dynamic> userDetails = userData['data'];
-    // To check the response
+    // Parse the JSON response into a Map
+    final Map<String, dynamic> data = json.decode(response.body);
 
-    // Check if the response status is 200
-    if (response.statusCode == 200) {
-      // Parse the JSON response into a Map
-      final Map<String, dynamic> data = json.decode(response.body);
+    // Check for successful login
+    if (response.statusCode == 200 && data['success'] == true) {
+      // Extract user data properly from the 'data' field
+      final userData = data['data'];
+      print("userData from login func SUCCESS: $userData");
 
-      // Now handle the data correctly
-      if (data != null && data['success'] == true) {
-        // Extract user data properly from the 'data' field
-        final userData = data['data'];
+      // Navigate to the next screen on successful login
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainTabView(userData: userData),
+        ),
+      );
 
-        print("userData from login func SUCCESS: $userData ");
-        // Navigate to the next screen on successful login
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                MainTabView(userData: userDetails), // Adjust as needed
-          ),
-        );
-
-        print("passed user data from login: $userData");
-
-        // Show a success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                "Welcome, ${userData['UserFirstName']} ${userData['UserLastName']}"),
-          ),
-        );
-      } else {
-        // If 'success' is false, handle the error
-        final error = data['error'];
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text(error != null ? data['error'] : 'Invalid credentials'),
-          ),
-        );
-      }
-    } else {
-      // Handle other status codes
+      // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Server Error: ${response.statusCode}')),
+        SnackBar(
+          content: Text(
+              "Welcome, ${userData['UserFirstName']} ${userData['UserLastName']}"),
+        ),
+      );
+    } else {
+      // Handle error response from backend (status code 400)
+      // This will correctly display the "User does not exist" or "Invalid email or password" message
+      String errorMessage = data['error'] ?? 'An error occurred';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   } catch (e) {
-    print("Error: ${e.toString()}"); // Log the error message
-    // Handle network errors
+    print("Error: ${e.toString()}");
+    // Handle network errors or JSON parsing errors
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('An error occured. Check logs')),
+      SnackBar(
+        content:
+            Text('Network error. Please check your connection and try again.'),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 }
