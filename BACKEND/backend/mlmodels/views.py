@@ -143,13 +143,13 @@ def predict_diabetes(request):
 
 
 try:
-    with open(os.path.join(MODEL_DIR, 'HP_scaler.pkl'), 'rb') as f:
+    with open(os.path.join(MODEL_DIR, 'HP_LGBM_SCALER.pkl'), 'rb') as f:
         hypertension_scaler = pickle.load(f)
 
-    with open(os.path.join(MODEL_DIR, 'HP_pca.pkl'), 'rb') as f:
+    with open(os.path.join(MODEL_DIR, 'HP_LGBM_PCA.pkl'), 'rb') as f:
         hypertension_pca = pickle.load(f)
 
-    with open(os.path.join(MODEL_DIR, 'HP_model.pkl'), 'rb') as f:
+    with open(os.path.join(MODEL_DIR, 'HP_LGBM_MODEL.pkl'), 'rb') as f:
         hypertension_model = pickle.load(f)
     
     HYPERTENSION_MODELS_LOADED = True
