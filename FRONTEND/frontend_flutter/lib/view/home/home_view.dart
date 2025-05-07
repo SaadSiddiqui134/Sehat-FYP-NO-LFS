@@ -404,22 +404,22 @@ class _HomeViewState extends State<HomeView>
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: _buildNavigationCard(
-                                "Workout Tracker",
-                                "Track your fitness progress",
-                                Icons.fitness_center,
-                                TColor.primaryColor2,
-                                () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => WorkoutTrackerView(
-                                        userData: widget.userData),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 15),
+                            // Expanded(
+                            //   child: _buildNavigationCard(
+                            //     "Workout Tracker",
+                            //     "Track your fitness progress",
+                            //     Icons.fitness_center,
+                            //     TColor.primaryColor2,
+                            //     () => Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //         builder: (context) => WorkoutTrackerView(
+                            //             userData: widget.userData),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                            SizedBox(height: 15),
                             Expanded(
                               child: _buildNavigationCard(
                                 "Meal Planner",
