@@ -87,7 +87,7 @@ We believe in making healthcare more accessible, data-driven, and user-friendly.
                         Icon(Icons.phone, color: TColor.primaryColor1),
                         SizedBox(width: 12),
                         Text(
-                          '+92 334 567 890',
+                          '+92 123 456 789',
                           style: TextStyle(
                             color: TColor.primaryColor1,
                             fontSize: 16,
@@ -104,7 +104,7 @@ We believe in making healthcare more accessible, data-driven, and user-friendly.
                         SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            '123 Dummy Street, Dummy City, Country',
+                            '123 Jinnah Street, Karachi, Pakistan',
                             style: TextStyle(
                               color: TColor.primaryColor1,
                               fontSize: 16,

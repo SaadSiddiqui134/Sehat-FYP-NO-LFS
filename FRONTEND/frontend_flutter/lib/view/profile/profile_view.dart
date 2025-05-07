@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../home/home_view.dart';
+
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
