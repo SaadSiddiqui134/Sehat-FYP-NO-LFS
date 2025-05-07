@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../common/colo_extension.dart';
+import 'diabetic_retinopathy_output.dart';
 
 class DiabeticRetinopathySymptomsView extends StatelessWidget {
   final Map<String, dynamic>? userData;
@@ -68,27 +69,35 @@ class DiabeticRetinopathySymptomsView extends StatelessWidget {
                 ElevatedButton.icon(
                   icon: Icon(Icons.photo_camera),
                   label: Text('Camera'),
-                  onPressed: null, // Disabled
+                  onPressed: () {
+                    print('Camera button pressed');
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: TColor.primaryColor1.withOpacity(0.5),
+                    backgroundColor: TColor.primaryColor1,
                   ),
                 ),
                 SizedBox(width: 16),
                 ElevatedButton.icon(
                   icon: Icon(Icons.photo_library),
                   label: Text('Gallery'),
-                  onPressed: null, // Disabled
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: TColor.primaryColor1.withOpacity(0.5),
+                    backgroundColor: TColor.primaryColor2,
                   ),
                 ),
               ],
             ),
             SizedBox(height: 32),
             ElevatedButton(
-              onPressed: null, // Disabled
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DiabeticRetinopathyOutputView()),
+                );
+              },
               style: ElevatedButton.styleFrom(
-                backgroundColor: TColor.primaryColor2.withOpacity(0.5),
+                backgroundColor: Colors.redAccent,
                 padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
