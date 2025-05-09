@@ -158,9 +158,6 @@ class _MealPlannerViewState extends State<MealPlannerView>
         );
       }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -413,13 +410,96 @@ class _MealPlannerViewState extends State<MealPlannerView>
     try {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
-        // Here you can handle the selected image
-        // For example, you could upload it to your backend
-        // or process it to extract food information
         print('Image selected: ${image.path}');
+        // Read the image file as bytes
+        final bytes = await image.readAsBytes();
+        print('Image bytes length: ${bytes.length}');
+        // Convert to base64
+        final base64Image = base64Encode(bytes);
+        print('Base64 image length: ${base64Image.length}');
+
+        setState(() {
+          isLoading = true;
+        });
+
+        try {
+          print('Sending request to: ${ApiConstants.detectFood}');
+          // Send to backend for food detection
+          final response = await http.post(
+            Uri.parse(ApiConstants.detectFood),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: json.encode({
+              'image': base64Image,
+            }),
+          );
+
+          print('Response status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+
+          setState(() {
+            isLoading = false;
+          });
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            // Show the detected food in a dialog
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Food Detected'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Detected Food: ${data['food']}'),
+                    Text(
+                        'Confidence: ${(data['confidence'] * 100).toStringAsFixed(1)}%'),
+                    SizedBox(height: 10),
+                    Text('Would you like to log this food?'),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // Pre-fill the search with the detected food
+                      searchController.text = data['food'];
+                      fetchNutritionData(data['food']);
+                    },
+                    child: Text('Log Food'),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            print('Error response: ${response.body}');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error detecting food: ${response.body}')),
+            );
+          }
+        } catch (e, stackTrace) {
+          print('Error in API call: $e');
+          print('Stack trace: $stackTrace');
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error picking image: $e');
+      print('Stack trace: $stackTrace');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
     }
   }
 

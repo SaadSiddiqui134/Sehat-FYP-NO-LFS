@@ -8,6 +8,10 @@ import numpy as np
 import pickle
 import os
 import pandas as pd
+import base64
+from PIL import Image
+import io
+import tensorflow as tf
 
 # Load the ML models
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +34,14 @@ try:
 except Exception as e:
     print(f"Error loading ML models: {e}")
     MODELS_LOADED = False
+
+# Load food detection model
+try:
+    food_model = tf.keras.models.load_model(os.path.join(MODEL_DIR, 'FOOD101_FINAL_MODEL_MOBILENETV2.h5'))
+    FOOD_MODEL_LOADED = True
+except Exception as e:
+    print(f"Error loading food detection model: {e}")
+    FOOD_MODEL_LOADED = False
 
 # Create your views here.
 @csrf_exempt
@@ -281,4 +293,82 @@ def predict_hypertension(request):
             print(traceback.format_exc())
             return JsonResponse({"error": str(e)}, status=500)
 
+    return JsonResponse({"message": "Only POST requests are accepted"}, status=405)
+
+@csrf_exempt
+def detect_food(request):
+    if request.method == 'POST':
+        try:
+            if not FOOD_MODEL_LOADED:
+                return JsonResponse({"error": "Food detection model failed to load"}, status=500)
+
+            # Get the image data from the request
+            data = json.loads(request.body)
+            image_data = data.get('image')
+            
+            if not image_data:
+                return JsonResponse({"error": "No image data provided"}, status=400)
+
+            # Decode base64 image
+            try:
+                # Remove the data URL prefix if present
+                if ',' in image_data:
+                    image_data = image_data.split(',')[1]
+                
+                image_bytes = base64.b64decode(image_data)
+                image = Image.open(io.BytesIO(image_bytes))
+                
+                # Resize image to match model input size (adjust size as needed)
+                image = image.resize((224, 224))
+                
+                # Convert to numpy array and preprocess
+                img_array = np.array(image)
+                img_array = img_array / 255.0  # Normalize
+                img_array = np.expand_dims(img_array, axis=0)
+                
+                # Make prediction
+                predictions = food_model.predict(img_array)
+                
+                # Get the top prediction
+                predicted_class = np.argmax(predictions[0])
+                confidence = float(predictions[0][predicted_class])
+                
+                # Map class index to food name (adjust according to your model's classes)
+                food_classes = [
+                    'apple pie', 'baby back ribs', 'baklava', 'beef carpaccio', 'beef tartare',
+                    'beet salad', 'beignets', 'bibimbap', 'bread_pudding', 'breakfast_burrito',
+                    'bruschetta', 'caesar salad', 'cannoli', 'caprese salad', 'carrot cake',
+                    'ceviche', 'cheesecake', 'cheese plate', 'chicken curry', 'chicken quesadilla',
+                    'chicken wings', 'chocolate cake', 'chocolate mousse', 'churros', 'clam chowder',
+                    'club sandwich', 'crab cakes', 'creme brulee', 'croque madame', 'cup cakes',
+                    'deviled eggs', 'donuts', 'dumplings', 'edamame', 'eggs benedict',
+                    'escargots', 'falafel', 'filet mignon', 'fish and chips', 'foie gras',
+                    'french fries', 'french onion soup', 'french toast', 'fried calamari', 'fried rice',
+                    'frozen yogurt', 'garlic bread', 'gnocchi', 'greek salad', 'grilled cheese sandwich',
+                    'grilled salmon', 'guacamole', 'gyoza', 'hamburger', 'hot and sour soup',
+                    'hot dog', 'huevos rancheros', 'hummus', 'ice cream', 'lasagna',
+                    'lobster bisque', 'lobster roll sandwich', 'macaroni and cheese', 'macarons', 'miso soup',
+                    'mussels', 'nachos', 'omelette', 'onion rings', 'oysters',
+                    'pad thai', 'paella', 'pancakes', 'panna cotta', 'peking duck',
+                    'pho', 'pizza', 'pork chop', 'poutine', 'prime rib',
+                    'pulled pork sandwich', 'ramen', 'ravioli', 'red velvet cake', 'risotto',
+                    'samosa', 'sashimi', 'scallops', 'seaweed salad', 'shrimp and grits',
+                    'spaghetti bolognese', 'spaghetti carbonara', 'spring rolls', 'steak', 'strawberry shortcake',
+                    'sushi', 'tacos', 'takoyaki', 'tiramisu', 'tuna tartare',
+                    'waffles'
+                ]
+                predicted_food = food_classes[predicted_class]
+                
+                return JsonResponse({
+                    "food": predicted_food,
+                    "confidence": confidence,
+                    "message": f"Detected {predicted_food} with {confidence:.2%} confidence"
+                })
+                
+            except Exception as e:
+                return JsonResponse({"error": f"Error processing image: {str(e)}"}, status=400)
+                
+        except Exception as e:
+            return JsonResponse({"error": f"Request processing failed: {str(e)}"}, status=400)
+            
     return JsonResponse({"message": "Only POST requests are accepted"}, status=405)

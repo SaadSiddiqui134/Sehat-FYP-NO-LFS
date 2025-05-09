@@ -4,7 +4,7 @@ class ApiConstants {
   static const String apiUrl =
       'https://api.calorieninjas.com/v1/nutrition?query='; // emulator
   // Change this one line to switch environments
-  static const String baseUrl = 'http://10.0.2.2:8000'; // emulator
+  static const String baseUrl = 'http://192.168.6.146:8000'; // emulator
   static final String baseUrlDevice = dotenv.env['DEVICE_IP'] ??
       'http://10.0.2.2:8000/user/login/'; // real device
 
@@ -59,4 +59,5 @@ class ApiConstants {
   static final String mealsData2 = '$baseUrlDevice/meals/getData/';
   static String mealsDataByDate2(int userId, String formattedDate) =>
       '$baseUrlDevice/meals/getData/date/?date=$formattedDate&user_id=$userId';
+  static final String detectFood = '$baseUrl/detect/food/';
 }
