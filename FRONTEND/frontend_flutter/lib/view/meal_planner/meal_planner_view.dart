@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import '../../../api_constants.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/find_eat_cell.dart';
@@ -56,6 +57,7 @@ class _MealPlannerViewState extends State<MealPlannerView>
   bool isLoading = false;
   Map<String, dynamic>? nutritionData;
   Timer? _refreshTimer;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -407,6 +409,57 @@ class _MealPlannerViewState extends State<MealPlannerView>
     }
   }
 
+  Future<void> _getImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(source: source);
+      if (image != null) {
+        // Here you can handle the selected image
+        // For example, you could upload it to your backend
+        // or process it to extract food information
+        print('Image selected: ${image.path}');
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Image Source'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: ListTile(
+                    leading: Icon(Icons.camera_alt),
+                    title: Text('Take Photo'),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _getImage(ImageSource.camera);
+                  },
+                ),
+                GestureDetector(
+                  child: ListTile(
+                    leading: Icon(Icons.photo_library),
+                    title: Text('Choose from Gallery'),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _getImage(ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -472,104 +525,119 @@ class _MealPlannerViewState extends State<MealPlannerView>
             children: [
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: TColor.lightGray,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search,
-                              color: TColor.gray,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextField(
-                                controller: searchController,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Log food",
-                                  hintStyle: TextStyle(
-                                    color: TColor.gray,
-                                    fontSize: 14,
-                                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: TColor.lightGray,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.search,
+                            color: TColor.gray,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Log food",
+                                hintStyle: TextStyle(
+                                  color: TColor.gray,
+                                  fontSize: 14,
                                 ),
-                                onChanged: (value) {
-                                  // This is optional as we already have a listener in initState
-                                  // But it can be useful for immediate updates
-                                  setState(() {
-                                    currentQuery = value;
-                                  });
-                                },
-                                onSubmitted: (value) {
-                                  fetchNutritionData(value);
-                                },
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  currentQuery = value;
+                                });
+                              },
+                              onSubmitted: (value) {
+                                fetchNutritionData(value);
+                              },
                             ),
-                            if (isLoading)
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: TColor.primaryColor1,
-                                ),
-                              )
-                            else
-                              IconButton(
-                                icon: Icon(Icons.search,
-                                    color: TColor.primaryColor1, size: 16),
-                                padding: EdgeInsets.zero,
-                                constraints: BoxConstraints(),
-                                onPressed: () {
-                                  fetchNutritionData(searchController.text);
-                                },
+                          ),
+                          if (isLoading)
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: TColor.primaryColor1,
                               ),
-                          ],
-                        ),
+                            )
+                          else
+                            IconButton(
+                              icon: Icon(Icons.search,
+                                  color: TColor.primaryColor1, size: 16),
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              onPressed: () {
+                                fetchNutritionData(searchController.text);
+                              },
+                            ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: TColor.secondaryColor1.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            isExpanded: true,
-                            value: selectedMealType,
-                            items: ["Breakfast", "Lunch", "Dinner"]
-                                .map((name) => DropdownMenuItem(
-                                      value: name,
-                                      child: Text(
-                                        name,
-                                        style: TextStyle(
-                                            color: TColor.gray, fontSize: 14),
-                                      ),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedMealType = value.toString();
-                              });
-                            },
-                            icon: Icon(Icons.expand_more,
-                                color: TColor.primaryColor1),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            height: 50,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                              color: TColor.secondaryColor1.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                isExpanded: true,
+                                value: selectedMealType,
+                                items: ["Breakfast", "Lunch", "Dinner"]
+                                    .map((name) => DropdownMenuItem(
+                                          value: name,
+                                          child: Text(
+                                            name,
+                                            style: TextStyle(
+                                                color: TColor.gray,
+                                                fontSize: 14),
+                                          ),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedMealType = value.toString();
+                                  });
+                                },
+                                icon: Icon(Icons.expand_more,
+                                    color: TColor.primaryColor1),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: TColor.primaryColor1,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.camera_alt, color: Colors.white),
+                              onPressed: _showImageSourceDialog,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -262,7 +262,7 @@ class _ResultViewState extends State<ResultView> {
                           height: 20,
                           width: media.width - 40,
                           backgroundColor: Colors.grey.shade100,
-                          foregrondColor: Colors.purple,
+                          foregroundColor: Colors.purple,
                           ratio: 0.62,
                           direction: Axis.horizontal,
                           curve: Curves.fastLinearToSlowEaseIn,
@@ -559,20 +559,20 @@ class _ResultViewState extends State<ResultView> {
                                             color: TColor.gray, fontSize: 12),
                                       ),
                                     ),
-
                                     SimpleAnimationProgressBar(
-                          height: 10,
-                          width: media.width - 120,
-                          backgroundColor: TColor.primaryColor1,
-                          foregrondColor: const Color(0xffFFB2B1) ,
-                          ratio: (double.tryParse(iObj["diff_per"].toString()) ?? 0.0) / 100.0 ,
-                          direction: Axis.horizontal,
-                          curve: Curves.fastLinearToSlowEaseIn,
-                          duration: const Duration(seconds: 3),
-                          borderRadius: BorderRadius.circular(5),
-                          
-                        ),
-
+                                      height: 10,
+                                      width: media.width - 120,
+                                      backgroundColor: TColor.primaryColor1,
+                                      foregroundColor: const Color(0xffFFB2B1),
+                                      ratio: (double.tryParse(iObj["diff_per"]
+                                                  .toString()) ??
+                                              0.0) /
+                                          100.0,
+                                      direction: Axis.horizontal,
+                                      curve: Curves.fastLinearToSlowEaseIn,
+                                      duration: const Duration(seconds: 3),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
                                     SizedBox(
                                       width: 25,
                                       child: Text(
@@ -588,7 +588,6 @@ class _ResultViewState extends State<ResultView> {
                                 )
                               ]);
                         }),
-                 
                     RoundButton(
                         title: "Back to Home",
                         onPressed: () {
