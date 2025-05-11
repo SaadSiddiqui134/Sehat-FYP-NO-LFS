@@ -15,7 +15,7 @@ class DiabetesOutputView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isPositive = prediction.toLowerCase().contains('positive');
+    final bool isPositive = prediction.toString() == "1";
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -139,15 +139,17 @@ class DiabetesOutputView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  if (isPositive) ...[
-                    Text(
-                      'Since you have been predicted to have diabetes, here are some important recommendations:',
-                      style: TextStyle(
-                        color: TColor.gray,
-                        fontSize: 14,
-                      ),
+                  Text(
+                    isPositive
+                        ? 'Since you have been predicted to have diabetes, here are some important recommendations:'
+                        : 'To maintain good health and prevent diabetes in the future:',
+                    style: TextStyle(
+                      color: TColor.gray,
+                      fontSize: 14,
                     ),
-                    const SizedBox(height: 8),
+                  ),
+                  const SizedBox(height: 8),
+                  if (isPositive) ...[
                     _buildBulletPoint(
                         'Schedule an appointment with your doctor for proper diagnosis and treatment plan'),
                     _buildBulletPoint(
@@ -161,17 +163,8 @@ class DiabetesOutputView extends StatelessWidget {
                         'Avoid smoking and limit alcohol consumption'),
                     _buildBulletPoint(
                         'Get regular check-ups for blood pressure and cholesterol'),
-                  ] else ...[
-                    Text(
-                      'To maintain good health and prevent diabetes in the future:',
-                      style: TextStyle(
-                        color: TColor.gray,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ..._buildPersonalizedTips(inputData),
                   ],
+                  ..._buildPersonalizedTips(inputData),
                 ],
               ),
             ),

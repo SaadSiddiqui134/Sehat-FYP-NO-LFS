@@ -7,11 +7,13 @@ import 'package:fitness/api_constants.dart';
 class SleepAddAlarmView2 extends StatefulWidget {
   final DateTime date; // optional, in case you pass from calendar
   final Map<String, dynamic>? userData;
+  final VoidCallback? onSleepLogAdded;
 
   const SleepAddAlarmView2({
     Key? key,
     required this.date,
     required this.userData,
+    this.onSleepLogAdded,
   }) : super(key: key);
 
   @override
@@ -62,30 +64,28 @@ class _SleepAddAlarmViewState2 extends State<SleepAddAlarmView2> {
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.logSleep),
-        body: {
-          'UserID': widget.userData!['UserID'].toString(),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'UserID': widget.userData!['UserID'],
           'date': selectedDate!.toIso8601String().split("T")[0],
           'sleep_start': sleepStart!.toIso8601String(),
           'sleep_end': sleepEnd!.toIso8601String(),
-        },
+        }),
       );
 
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
-
       if (response.statusCode == 201) {
-        Navigator.pop(context);
+        if (widget.onSleepLogAdded != null) {
+          widget.onSleepLogAdded!();
+        }
+        Navigator.pop(context, true);
       } else {
-        print("resonse status code: ${response.statusCode}");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save sleep log.')),
+          SnackBar(content: Text('Failed to add sleep log.')),
         );
       }
     } catch (e) {
-      print("Error during request: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Something went wrong. Please try again.')),
+        SnackBar(content: Text('Error: $e')),
       );
     } finally {
       setState(() => isSubmitting = false);

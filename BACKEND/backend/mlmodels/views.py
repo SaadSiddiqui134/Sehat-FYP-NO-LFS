@@ -71,10 +71,24 @@ def predict_diabetes(request):
                 smoking = smoking_map.get(data.get('smoking_history', '').lower(), 0)
                 hypertension = yes_no_map.get(data.get('hypertension', '').lower(), 0)
                 heart_disease = yes_no_map.get(data.get('heart_disease', '').lower(), 0)
+                
+                # Validate numeric inputs
                 age = float(data.get('age', 0))
+                if not (0 <= age <= 120):
+                    return JsonResponse({"error": "Age must be between 0 and 120"}, status=400)
+                
                 bmi = float(data.get('bmi', 0))
+                if not (10 <= bmi <= 50):
+                    return JsonResponse({"error": "BMI must be between 10 and 50"}, status=400)
+                
                 hba1c = float(data.get('HbA1c_level', 0))
+                if not (3 <= hba1c <= 15):
+                    return JsonResponse({"error": "HbA1c level must be between 3 and 15"}, status=400)
+                
                 glucose = float(data.get('blood_glucose_level', 0))
+                if not (50 <= glucose <= 500):
+                    return JsonResponse({"error": "Blood glucose level must be between 50 and 500"}, status=400)
+                
                 diabetes = yes_no_map.get(data.get('diabetes', '').lower(), 0)
             except ValueError as e:
                 return JsonResponse({"error": f"Invalid numeric value: {str(e)}"}, status=400)
@@ -92,7 +106,20 @@ def predict_diabetes(request):
                 features_df = pd.DataFrame(features, columns=columns)
                 features_scaled = scaler.transform(features_df)
                 features_pca = pca.transform(features_scaled)
+                
+                # Get prediction probabilities
+                if hasattr(model, 'predict_proba'):
+                    probabilities = model.predict_proba(features_pca)[0]
+                    print("Prediction probabilities:", probabilities)
+                
                 prediction = int(model.predict(features_pca)[0])
+
+                # Add debug logging
+                print("Input features:", features.tolist())
+                print("Scaled features:", features_scaled.tolist())
+                print("PCA transformed features:", features_pca.tolist())
+                print("Raw prediction:", model.predict(features_pca))
+                print("Final prediction:", prediction)
             except Exception as e:
                 import traceback
                 print(f"Prediction error: {e}")
@@ -233,6 +260,10 @@ def predict_hypertension(request):
                 features_scaled = hypertension_scaler.transform(features_df)
                 features_pca = hypertension_pca.transform(features_scaled)
                 prediction = int(hypertension_model.predict(features_pca)[0])
+                print("Input features:", features_df)
+                if hasattr(hypertension_model, 'predict_proba'):
+                    print("Prediction probabilities:", hypertension_model.predict_proba(features_pca)[0])
+                print("Raw prediction:", hypertension_model.predict(features_pca))
             except Exception as e:
                 import traceback
                 print(f"Prediction error: {e}")
@@ -371,4 +402,58 @@ def detect_food(request):
         except Exception as e:
             return JsonResponse({"error": f"Request processing failed: {str(e)}"}, status=400)
             
+    return JsonResponse({"message": "Only POST requests are accepted"}, status=405)
+
+DR_MODEL_PATH = os.path.join(BASE_DIR, 'mlmodel', 'dr_model_final_DR.keras')
+try:
+    dr_model = tf.keras.models.load_model(DR_MODEL_PATH)
+    DR_MODEL_LOADED = True
+except Exception as e:
+    print("❌ Failed to load diabetic retinopathy model:", e)
+    DR_MODEL_LOADED = False
+
+# Class labels (index to severity mapping)
+SEVERITY_CLASSES = ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative DR']
+
+@csrf_exempt
+def predict_retinopathy_severity(request):
+    if request.method == 'POST':
+        if not DR_MODEL_LOADED:
+            return JsonResponse({"error": "Model failed to load"}, status=500)
+
+        try:
+            data = json.loads(request.body)
+            image_data = data.get('image')
+
+            if not image_data:
+                return JsonResponse({"error": "No image data provided"}, status=400)
+
+            # Strip base64 prefix if present
+            if ',' in image_data:
+                image_data = image_data.split(',')[1]
+
+            # Decode and load image
+            image_bytes = base64.b64decode(image_data)
+            image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+            image = image.resize((224, 224))
+
+            # Convert to numpy array
+            img_array = np.array(image) / 255.0  # Normalize
+            img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+
+            # Predict
+            predictions = dr_model.predict(img_array)
+            predicted_class_index = int(np.argmax(predictions[0]))
+            confidence_score = float(predictions[0][predicted_class_index])
+            severity = SEVERITY_CLASSES[predicted_class_index]
+
+            return JsonResponse({
+                "severity": severity,
+                "confidence": confidence_score,
+                "message": f"Predicted severity: {severity} ({confidence_score:.2%})"
+            })
+
+        except Exception as e:
+            return JsonResponse({"error": f"Prediction error: {str(e)}"}, status=400)
+
     return JsonResponse({"message": "Only POST requests are accepted"}, status=405)

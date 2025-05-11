@@ -8,6 +8,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import '../login/login_view.dart';
 import '../profile/contact_us.dart';
 import '../profile/privacy_policy.dart';
+import 'user_details_view.dart';
 
 class ProfileView extends StatefulWidget {
   final Map<String, dynamic>? userData;
@@ -183,7 +184,17 @@ class _ProfileViewState extends State<ProfileView> {
                     return SettingRow(
                       icon: iObj["image"].toString(),
                       title: iObj["name"].toString(),
-                      onPressed: () {},
+                      onPressed: () {
+                        if (iObj["name"] == "Personal Data") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserDetailsView(
+                                  userData: widget.userData ?? {}),
+                            ),
+                          );
+                        }
+                      },
                     );
                   }),
                 ),

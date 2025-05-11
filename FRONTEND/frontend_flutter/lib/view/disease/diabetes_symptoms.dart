@@ -197,12 +197,16 @@ class _DiabetesSymptomsViewState extends State<DiabetesSymptomsView> {
                           'blood_glucose_level': bloodGlucoseController.text
                         };
 
+                        print(jsonEncode(requestData));
+
                         // Send request to backend
                         final response = await http.post(
                           Uri.parse(ApiConstants.predictDiseaseDiabetes),
                           headers: {'Content-Type': 'application/json'},
                           body: jsonEncode(requestData),
                         );
+
+                        print(response.body);
 
                         // Close loading indicator
                         Navigator.pop(context);

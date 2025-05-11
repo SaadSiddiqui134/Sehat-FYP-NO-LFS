@@ -13,7 +13,9 @@ import '../../common_widget/today_sleep_schedule_row.dart';
 
 class SleepScheduleView extends StatefulWidget {
   final Map<String, dynamic>? userData;
-  const SleepScheduleView({Key? key, this.userData}) : super(key: key);
+  final VoidCallback? onSleepLogAdded;
+  const SleepScheduleView({Key? key, this.userData, this.onSleepLogAdded})
+      : super(key: key);
 
   @override
   State<SleepScheduleView> createState() => _SleepScheduleViewState();
@@ -395,7 +397,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                           ),
                         ),
                       ],
-                      rows: userSleepLogs.map((log) {
+                      rows: userSleepLogs.take(7).map((log) {
                         final date = log['date'] ?? '';
                         final start = formatTime(log['sleep_start']);
                         final end = formatTime(log['sleep_end']);
@@ -523,14 +525,20 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
         ),
       ),
       floatingActionButton: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => SleepAddAlarmView2(
-                  date: _selectedDateAppBar, userData: widget.userData),
+                date: DateTime.now(),
+                userData: widget.userData,
+                onSleepLogAdded: widget.onSleepLogAdded,
+              ),
             ),
           );
+          if (result == true) {
+            fetchSleepLogs();
+          }
         },
         child: Container(
           width: 55,
